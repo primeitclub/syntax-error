@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Accounts',
+    'Dashboard'
 ]
 
 MIDDLEWARE = [
@@ -140,3 +141,7 @@ EMAIL_USE_SSL = False
 EMAIL_HOST_USER = "hamrohr.webapp@gmail.com"
 EMAIL_HOST_PASSWORD = "psop hhcv njfx pigr"
 EMAIL_FROM = "Employee Management System <hamrohr.webapp@gmail.com>"
+
+
+# Login Redirect URL
+LOGIN_URL = '/'

@@ -41,6 +41,8 @@ class Project(models.Model):
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user_name = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True)
     points = models.IntegerField(default=0)
     description = models.TextField(blank=True, null=True)
     interest_fields = models.CharField(max_length=255, blank=True, null=True)
@@ -53,10 +55,6 @@ class Student(models.Model):
 
     def __str__(self):
         return self.user.username
-
-    @property
-    def email(self):
-        return self.user.email
 
     @property
     def username(self):
