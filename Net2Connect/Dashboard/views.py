@@ -9,6 +9,9 @@ from .models import Project, Category
 from django.http import JsonResponse
 from django.db import models
 from Accounts.models import Student
+
+
+
 def dashboard(request):
     return render(request,'dashboard.html')
 

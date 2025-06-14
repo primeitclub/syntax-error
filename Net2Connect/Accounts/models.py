@@ -10,7 +10,7 @@ from django.utils import timezone
 def create_user():
     user = User.objects.create_user(
         "admin", "Pravin.admin@gmail.com", "admin123")
-    user.first_name = 'Pravin',
+    user.first_name = 'Pravin'
     user.last_name = "Gyawali"
 
     user.save()
@@ -27,14 +27,7 @@ class Skill(models.Model):
 # Project Model
 
 
-class Project(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
 
-    def __str__(self):
-        return self.title
 
 # Student Model
 class Student(models.Model):
@@ -42,14 +35,18 @@ class Student(models.Model):
     user_name = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     points = models.IntegerField(default=0)
+    
+    address = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     interest_fields = models.CharField(max_length=255, blank=True, null=True)
     number_of_connections = models.IntegerField(default=0)
+    website_url = models.URLField(blank=True, null=True)
     github_url = models.URLField(blank=True, null=True)
+    linkedin_url = models.URLField(blank=True, null=True)
+
     date_joined = models.DateTimeField(default=timezone.now)
     last_active = models.DateTimeField(null=True, blank=True)
     skills = models.ManyToManyField(Skill, blank=True)
-    projects = models.ManyToManyField(Project, blank=True)
 
     def __str__(self):
         return self.user.username
@@ -57,6 +54,10 @@ class Student(models.Model):
     @property
     def username(self):
         return self.user.username
+    
+    @property
+    def full_name(self):
+        return f"{self.user.first_name} {self.user.last_name}"
 
 
 # EMail OTP

@@ -115,7 +115,9 @@ def logout_view(request):
 
 
 def profile(request):
-    return render(request,'profile.html')
+    student = Student.objects.filter(user=request.user).first()
+    return render(request,'profile.html', {'student': student})
 
 def editprofile(request):
-    return render(request,'editprofile.html')
+    student = Student.objects.filter(user=request.user).first()
+    return render(request,'editprofile.html', {'student': student})
