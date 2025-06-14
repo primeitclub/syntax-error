@@ -13,6 +13,8 @@ urlpatterns = [
     path('projects/add/', views.add_project, name='add_project'),
     path('projects/<int:project_id>/', views.project_detail, name='project_detail'),
     path('projects/<int:project_id>/update/', views.update_project, name='update_project'),
+    path('project_ui/', views.project_ui, name='project_ui')
+    
 ]
 
 

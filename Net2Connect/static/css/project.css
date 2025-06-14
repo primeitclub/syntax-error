@@ -1,0 +1,204 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  display: flex;
+  height: 100vh;
+  background-color: #f8f8f8;
+  overflow: hidden;
+}
+.sidebar {
+  width: 80px;
+  height: 100%;
+  background-color: #1f1f38;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+  color: #fff;
+}
+.sidebar div {
+  margin: 0.8rem 0;
+  width: 40px;
+  height: 40px;
+  background: #333;
+  border-radius: 10px;
+}
+.main {
+  flex: 1;
+  padding: 1.2rem;
+  margin: 0 1.2rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+.search input {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 1.2rem;
+  height: 100%;
+}
+.left-panel {
+  display: grid;
+  grid-template-rows: 1.5fr 1fr;
+  gap: 1.2rem;
+  height: 100%;
+}
+.calendar, .project-directory {
+  background: #fff;
+  padding: 0.8rem;
+  border-radius: 15px;
+  height: 100%;
+}
+.right-panel {
+  display: grid;
+  grid-template-rows: 1.3fr 1fr;
+  gap: 1.2rem;
+  height: 100%;
+}
+.urgent-tasks, .comments, .team-directory {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 15px;
+  height: 100%;
+}
+
+.urgent-tasks button {
+  background-color: #65ff65;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.urgent-tasks button:hover {
+  background-color: #57d757;
+}
+.urgent-tasks button.active,
+.urgent-tasks button:active {
+  background-color: #4cb74c;
+  outline: none;
+  box-shadow: none;
+}
+.urgent-tasks button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+#newTaskInput {
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  outline: none;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+#taskList li {
+  margin-bottom: 0.5rem;
+}
+#taskList li input[type="checkbox"] {
+  transform: scale(1.1);
+}
+
+.calendar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.calendar table {
+  width: 100%;
+  height: 100%;
+  border-collapse: separate;
+  border-spacing: 8px;
+  text-align: center;
+  table-layout: fixed; /* uniform cell widths */
+}
+
+.calendar th {
+  padding: 8px 0;
+  color: #999;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.calendar td {
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  font-weight: 500;
+  color: #333;
+  transition: 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  vertical-align: middle;
+  font-size: 14px;
+  width: auto;
+  height: 43px;
+}
+
+.calendar td:hover {
+  background-color: #e0e0e0;
+}
+
+.calendar td.today {
+  background-color: #ff8a65;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.calendar td.range {
+  background-color: #b2dfdb;
+  color: #fff;
+}
+
+.calendar td.today {
+  border: 3px solid rgb(77, 233, 254);
+  color: rgb(88, 130, 255);
+}
+
+.calendar td.holiday {
+  background-color: #ff8a65;  /* your today color */
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.cmts-and-team {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  gap: 1rem;
+}
+
+.comments, .team-directory {
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* add this line */
+}
+
+

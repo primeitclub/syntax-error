@@ -28,7 +28,7 @@ def login_view(request):
             if user is not None:
                 
                 login(request, user)
-                return redirect('/dashboard')
+                return redirect('/dashboard/feed')
             else:
                 error = 'Invalid password'
 
@@ -103,7 +103,7 @@ def register_view(request):
         # Save user ID in session
         request.session['pending_user_id'] = user.id
 
-        return redirect('verify_otp')
+        return redirect('account:verify_otp')
 
     return render(request, 'registration/register.html')
 

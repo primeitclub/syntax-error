@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden, HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -9,6 +9,7 @@ from .models import Project, Category
 from django.http import JsonResponse
 from django.db import models
 from Accounts.models import Student
+
 def dashboard(request):
     return render(request,'dashboard.html')
 
@@ -128,3 +129,6 @@ def home_view(request):
         'student': student_data
     }
     return render(request, 'dashboard.html', context)
+
+def project_ui(request):
+    return render(request, 'project_ui.html')
