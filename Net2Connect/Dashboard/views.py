@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden, HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -32,6 +34,7 @@ def logout_view(request):
     return render(request,'logout.html')
 
 # Removed @login_required for testing
+@login_required
 def add_project(request):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -62,12 +65,13 @@ def add_project(request):
             return redirect('add_project')
     
     categories = Category.objects.all()
-    return render(request, 'Dashboard/add_project.html', {
+    return render(request, 'add_project.html', {
         'categories': categories,
         'privacy_choices': Project.PRIVACY_CHOICES
     })
 
 # Removed @login_required for testing
+@login_required
 def update_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     
@@ -91,23 +95,30 @@ def update_project(request, project_id):
             messages.error(request, f'Error updating project: {str(e)}')
     
     categories = Category.objects.all()
-    return render(request, 'Dashboard/update_project.html', {
+    return render(request, 'update_project.html', {
         'project': project,
         'categories': categories,
         'privacy_choices': Project.PRIVACY_CHOICES
     })
 
 # Removed @login_required for testing
+@login_required
 def project_detail(request, project_id):
     project = get_object_or_404(Project, id=project_id)
-    return render(request, 'Dashboard/project_detail.html', {
+    return render(request, 'project_detail.html', {
         'project': project
     })
 
 # Removed @login_required for testing
-# @login_required
+
 def project_list(request):
     projects = Project.objects.all()
-    return render(request, 'Dashboard/project_list.html', {
+    return render(request, 'project_list.html', {
         'projects': projects
-    })
+    })@login_required(login_url='/')
+
+    
+def home_view(request):
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden("You are not allowed to access this page.")
+    return render(request, 'home.html')
