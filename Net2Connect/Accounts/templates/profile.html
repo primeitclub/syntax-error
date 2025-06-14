@@ -95,7 +95,7 @@
         <div class="col-lg-4 mb-4">
             <div class="profile-card text-center">
                 <div class="profile-header">
-                    <img src="{{ student.avatar_url|default:'https://bootdey.com/img/Content/avatar/avatar7.png' }}" alt="Avatar">
+                    <a href="{%url 'account:profile'%}"><img src="{{ student.avatar_url|default:'https://bootdey.com/img/Content/avatar/avatar7.png' }}" alt="Avatar"></a>
                     <h4>{{ student.full_name }}</h4>
                     <p class="text-muted mb-1">Student</p>
                     <span class="badge bg-success">{{ student.points }} Points</span>
@@ -118,7 +118,7 @@
                                 </tr>
                                 <tr>
                                     <th class="text-left">Connections:</th>
-                                    <td class="text-left">{{ student.connections_count }}</td>
+                                    <td class="text-left"><a href="{% url 'connections:connected_list' %}">{{ student.connections_count }}</a></td>
                                 </tr>
                             </tbody>
                         </table>

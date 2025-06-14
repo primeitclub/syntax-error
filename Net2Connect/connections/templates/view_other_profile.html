@@ -77,30 +77,30 @@
             <div class="profile-card text-center">
                 <div class="profile-header">
                     <img src="{{ student.avatar_url|default:'https://bootdey.com/img/Content/avatar/avatar7.png' }}" alt="Avatar">
-                    <h4>{{ student.full_name }}</h4>
+                    <h4>{{ connect_student.full_name }}</h4>
                     <p class="text-muted mb-1">Student</p>
-                    <span class="badge bg-success">{{ student.points }} Points</span>
+                    <span class="badge bg-success">{{ connect_student.points }} Points</span>
                 </div>
                 <div class="profile-body text-start">
                     <div class="profile-info">
-                        <strong>Username:</strong> {{ student.username }}<br>
-                        <strong>Email:</strong> {{ student.email }}<br>
-                        <strong>Address:</strong> {{ student.address|default:"N/A" }}<br>
+                        <strong>Username:</strong> {{ connect_student.username }}<br>
+                        <strong>Email:</strong> {{ connect_student.email }}<br>
+                        <strong>Address:</strong> {{ connect_student.address|default:"N/A" }}<br>
                         <strong>Connections:</strong>
                         <a href="{% url 'connections:connected_list' %}">
-                            {{ student.connections_count }}
+                            {{ connect_student.connections_count }}
                         </a>
                     </div>
 
                     <div class="social-links mt-3">
-                        {% if student.website_url %}
-                            <a href="{{ student.website_url }}" target="_blank">🌐 Website</a>
+                        {% if connect_student.website_url %}
+                            <a href="{{ connect_student.website_url }}" target="_blank">🌐 Website</a>
                         {% endif %}
-                        {% if student.github_url %}
-                            <a href="{{ student.github_url }}" target="_blank">🐙 GitHub</a>
+                        {% if connect_student.github_url %}
+                            <a href="{{ connect_student.github_url }}" target="_blank">🐙 GitHub</a>
                         {% endif %}
-                        {% if student.linkedin_url %}
-                            <a href="{{ student.linkedin_url }}" target="_blank">🔗 LinkedIn</a>
+                        {% if connect_student.linkedin_url %}
+                            <a href="{{ connect_student.linkedin_url }}" target="_blank">🔗 LinkedIn</a>
                         {% endif %}
                     </div>
                 </div>
@@ -112,14 +112,14 @@
             <div class="profile-card">
                 <div class="profile-body">
                     <h5 class="profile-section-title">About</h5>
-                    <p class="text-muted">{{ student.description|default:"No description provided." }}</p>
+                    <p class="text-muted">{{ connect_student.description|default:"No description provided." }}</p>
 
                     <h5 class="profile-section-title">Interests</h5>
-                    <p class="text-muted">{{ student.interest_fields|default:"Not specified." }}</p>
+                    <p class="text-muted">{{ connect_student.interest_fields|default:"Not specified." }}</p>
 
                     <h5 class="profile-section-title">Skills</h5>
-                    {% if student.skills.all %}
-                        {% for skill in student.skills.all %}
+                    {% if connect_student.skills.all %}
+                        {% for skill in connect_student.skills.all %}
                             <span class="skill-badge">{{ skill.name }}</span>
                         {% endfor %}
                     {% else %}
@@ -128,8 +128,8 @@
 
                     <h5 class="profile-section-title">Activity</h5>
                     <div class="profile-info">
-                        <strong>Joined:</strong> {{ student.date_joined|date:"F d, Y" }}<br>
-                        <strong>Last Active:</strong> {{ student.last_active|default:"N/A" }}
+                        <strong>Joined:</strong> {{ connect_student.date_joined|date:"F d, Y" }}<br>
+                        <strong>Last Active:</strong> {{ connect_student.last_active|default:"N/A" }}
                     </div>
                 </div>
             </div>

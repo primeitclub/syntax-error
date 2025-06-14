@@ -9,7 +9,6 @@ from .models import ConnectionRequest
 from Accounts.models import Student
 
 
-# 🔄 Send Connection Request
 @login_required
 def send_connection_request(request, to_user_id):
     to_user = get_object_or_404(User, id=to_user_id)
@@ -31,9 +30,10 @@ def send_connection_request(request, to_user_id):
 # 🔄 View All Incoming Requests
 @login_required
 def list_connection_requests(request):
+    student = Student.objects.filter(user=request.user).first()
     pending_requests = ConnectionRequest.objects.filter(
         to_user=request.user, accepted__isnull=True)
-    return render(request, 'requests.html', {'requests': pending_requests})
+    return render(request, 'requests.html', {'requests': pending_requests,'student': student})
 
 
 # 🔄 Respond to Connection Request
@@ -68,8 +68,12 @@ def respond_connection_request(request, request_id, action):
 @login_required
 def connected_list(request):
     student = get_object_or_404(Student, user=request.user)
+
+    if not student:
+        return JsonResponse({'error': 'Student profile not found'}, status=404)
+
     connections = student.connections.all()
-    return render(request, 'connected_list.html', {'connections': connections})
+    return render(request, 'connected_list.html', {'connections': connections, 'student': student})
 
 
 # 🔄 Delete/Remove Connection
@@ -91,4 +95,4 @@ def delete_connection(request, user_id):
 @login_required
 def view_other_profile(request, user_id):
     student = get_object_or_404(Student, user__id=user_id)
-    return render(request, 'view_other_profile.html', {'student': student})
+    return render(request, 'view_other_profile.html', {'connect_student': student})
