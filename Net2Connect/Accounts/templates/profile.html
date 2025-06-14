@@ -68,6 +68,19 @@
     .social-links a:hover {
         text-decoration: underline;
     }
+
+    .profile-info{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+    .profile-info table th,
+    .profile-info table td {
+        padding: 0.2rem 0.5rem;
+        vertical-align: top;
+        text-align: left;
+    }
+    
 </style>
 
 <div class="container my-5">
@@ -83,11 +96,28 @@
                 </div>
                 <div class="profile-body text-start">
                     <div class="profile-info">
-                        <strong>Username:</strong> {{ student.username }}<br>
-                        <strong>Email:</strong> {{ student.email }}<br>
-                        <strong>Address:</strong> {{ student.address|default:"N/A" }}<br>
-                        <strong>Connections:</strong> {{ student.number_of_connections }}
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <th class="text-left">Username:</th>
+                                    <td class="text-left">{{ student.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-left">Email:</th>
+                                    <td class="text-left">{{ student.email }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-left">Address:</th>
+                                    <td class="text-left">{{ student.address|default:"N/A" }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-left">Connections:</th>
+                                    <td class="text-left">{{ student.number_of_connections }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+
                     <div class="social-links mt-3">
                         {% if student.website_url %}
                             <a href="{{ student.website_url }}" target="_blank">🌐 Website</a>
