@@ -11,9 +11,7 @@ venv/
 # SQLite database (optional)
 db.sqlite3
 
-# Django static and media files
-staticfiles/
-media/
+
 
 # VS Code settings (optional)
 .vscode/
