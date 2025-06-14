@@ -9,7 +9,7 @@
     <p>Hello {{ student.user_name }}</p>
 
     <!-- Logout Button -->
-    <form method="POST" action="{% url 'logout' %}">
+    <form method="POST" action="{% url 'account:logout' %}">
         {% csrf_token %}
         <button type="submit">Logout</button>
     </form>

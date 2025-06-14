@@ -10,7 +10,7 @@ from django.utils import timezone
 def create_user():
     user = User.objects.create_user(
         "admin", "Pravin.admin@gmail.com", "admin123")
-    user.first_name = 'Pravin',
+    user.first_name = 'Pravin'
     user.last_name = "Gyawali"
 
     user.save()
@@ -24,17 +24,37 @@ class Skill(models.Model):
     def __str__(self):
         return self.name
 
-# Project Model
-
 
 class Project(models.Model):
+    STATUS_CHOICES = [
+        ('ongoing', 'Ongoing'),
+        ('completed', 'Completed'),
+    ]
+
+    ACCESS_TYPE = [
+        ('open', 'Open to All'),
+        ('invite', 'By Invitation Only'),
+    ]
+
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='owned_projects',)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    start_date = models.DateField(null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True,)
     end_date = models.DateField(null=True, blank=True)
+
+    access_type = models.CharField(
+        max_length=10, choices=ACCESS_TYPE, default='invite')
+    max_members = models.PositiveIntegerField(default=1)
+
+    points = models.PositiveIntegerField(default=0)
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='ongoing')
+
 
     def __str__(self):
         return self.title
+
 
 # Student Model
 class Student(models.Model):
@@ -46,10 +66,12 @@ class Student(models.Model):
     interest_fields = models.CharField(max_length=255, blank=True, null=True)
     number_of_connections = models.IntegerField(default=0)
     github_url = models.URLField(blank=True, null=True)
+    facebook_url = models.URLField(blank=True, null=True)
+    linkedin_url = models.URLField(blank=True, null=True)
+
     date_joined = models.DateTimeField(default=timezone.now)
     last_active = models.DateTimeField(null=True, blank=True)
     skills = models.ManyToManyField(Skill, blank=True)
-    projects = models.ManyToManyField(Project, blank=True)
 
     def __str__(self):
         return self.user.username
@@ -57,6 +79,7 @@ class Student(models.Model):
     @property
     def username(self):
         return self.user.username
+
 
 
 # EMail OTP

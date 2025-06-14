@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Student, Skill, Project
+from .models import Student, Skill,Project
 
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('user_name', 'email', 'points', 'date_joined')
@@ -11,10 +11,10 @@ class StudentAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'user_name', 'email', 'points', 'description', 'interest_fields', 'number_of_connections', 'github_url')
+            'fields': ('user', 'user_name', 'email', 'points', 'description', 'interest_fields', 'number_of_connections', 'github_url', 'facebook_url', 'linkedin_url')
         }),
-        ('Skills and Projects', {
-            'fields': ('skills', 'projects')
+        ('Skills', {
+            'fields': ('skills',)
         }),
         ('Activity', {
             'fields': ('date_joined', 'last_active')

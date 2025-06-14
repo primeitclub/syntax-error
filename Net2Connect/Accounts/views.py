@@ -101,7 +101,7 @@ def register_view(request):
         # Save user ID in session
         request.session['pending_user_id'] = user.id
 
-        return redirect('verify_otp')
+        return redirect('account:verify_otp')
 
     return render(request, 'registration/register.html')
 
@@ -109,4 +109,4 @@ def register_view(request):
 # Logout view to handle user logout
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('account:login')
