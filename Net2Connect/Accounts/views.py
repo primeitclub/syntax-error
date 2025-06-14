@@ -11,9 +11,9 @@ def login_view(request):
             login(request, user)
             return render(request, 'home.html', {'user': user})
         else:
-            return render(request, 'login.html', {'error': 'Invalid credentials'})
+            return render(request, 'registration/login.html', {'error': 'Invalid credentials'})
     
-    return render(request, 'login.html')
+    return render(request, 'registration/login.html')
 
 # Logout view
 def logout_view(request):
