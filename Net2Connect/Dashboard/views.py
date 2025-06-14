@@ -15,6 +15,7 @@ from Accounts.models import Student
 
 
 def dashboard(request):
+    student = Student.objects.filter(user=request.user).first()
     return render(request, 'dashboard.html')
 
 
@@ -104,11 +105,11 @@ def feed(request):
 
 
 def collab(request):
-    return render(request, 'collab.html')
+    student = Student.objects.filter(user=request.user).first()
+
+    return render(request, 'collab.html',{'student': student})
 
 
-def group(request):
-    return render(request, 'group.html')
 
 
 def inbox(request):

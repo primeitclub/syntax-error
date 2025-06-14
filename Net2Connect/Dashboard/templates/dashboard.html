@@ -177,17 +177,15 @@
   <aside class="sidebar">
     <div class="text-center">
       <h4>Net2Connect</h4>
-      <a href="{%url 'account:profile' %}"><img src="{{ student.avatar_url|default:'https://bootdey.com/img/Content/avatar/avatar7.png' }}" alt="Avatar" /></a>
-      <div class="username">{{ student.full_name }}</div>
+      <a href="{% url 'account:profile' %}"><img src="{{ student.avatar_url|default:'https://bootdey.com/img/Content/avatar/avatar7.png' }}" alt="Avatar" /></a>
+      <div>{{ user.first_name }} {{user.last_name}}</div>
     </div>
 
     <ul>
       <li class="{% if request.path == '/dashboard/feed/' %}active{% endif %}">
         <a href="{% url 'dashboard:feed' %}">Feed</a>
       </li>
-      <li class="{% if request.path == '/dashboard/group/' %}active{% endif %}">
-        <a href="{% url 'dashboard:group' %}">Group</a>
-      </li>
+      
       <li class="{% if request.path == '/dashboard/collab/' %}active{% endif %}">
         <a href="{% url 'dashboard:collab' %}">Collab</a>
       </li>
