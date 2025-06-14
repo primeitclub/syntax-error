@@ -1,0 +1,76 @@
+{% extends "dashboard.html" %}
+{% block title %}Create Project{% endblock %}
+
+{% block content %}
+<style>
+  .form-section {
+    margin-top: 2rem;
+  }
+  .form-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    max-width: 600px;
+    margin: auto;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  }
+  .form-card h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .form-card .form-label {
+    font-weight: 600;
+  }
+  .form-card .btn-primary {
+    width: 100%;
+    margin-top: 1rem;
+  }
+  .messages .alert {
+    margin-bottom: 1rem;
+  }
+</style>
+
+<div class="form-section">
+  <div class="form-card">
+    <h2>Create New Project</h2>
+
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label for="title" class="form-label">Project Title</label>
+        <input type="text" class="form-control" id="title" name="title" maxlength="200" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="privacy" class="form-label">Project Visibility</label>
+        <select class="form-select" id="privacy" name="privacy" required>
+          <option value="private" selected>Private</option>
+          <option value="public">Public</option>
+        </select>
+        <div class="form-text mt-1">
+          <strong>Private</strong>: Only invited members can join<br>
+          <strong>Public</strong>: Anyone can join
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Create Project</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

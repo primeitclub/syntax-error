@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Auth Page{% endblock %}</title>
+    <style>
+      :root {
+        --primary-color: #3e1edd; /* coral */
+        --accent-color: #1d7aec; /* golden pastel */
+        --background: #ffffff;
+        --text-color: #333333;
+        --button-hover: #fb926e;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: var(--background);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-color);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .auth-wrapper {
+        display: flex;
+        flex-direction: row;
+        width: 90%;
+        max-width: 900px;
+        height: 600px;
+        border-radius: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background-color: white;
+      }
+
+      .form-side {
+        width: 50%;
+        padding: 3rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .image-side {
+        width: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--accent-color)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      h2 {
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="password"] {
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+      }
+
+      button {
+        padding: 0.75rem;
+        background-color: var(--primary-color);
+        border: none;
+        border-radius: 0.5rem;
+        font-weight: bold;
+        cursor: pointer;
+        color: #fff;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: var(--button-hover);
+      }
+
+      .link-text {
+        margin-top: 1rem;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+
+      .link-text a {
+        color: #ff6f61;
+        text-decoration: none;
+      }
+
+      .link-text a:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+        .auth-wrapper {
+          flex-direction: column;
+          height: auto;
+        }
+
+        .form-side,
+        .image-side {
+          width: 100%;
+          height: auto;
+        }
+
+        .image-side {
+          min-height: 200px;
+        }
+      }
+    </style>
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+    <div class="auth-wrapper">
+      <div class="form-side">{% block content %}{% endblock %}</div>
+      <div class="image-side">
+        {% load static %}
+        <img
+          src="{% static 'images/hero-collaborate-support.png' %}"
+          alt="Auth Image"
+          style="width: 100%; height: 100%; object-fit: cover; border-radius: 0 1rem 1rem 0;"
+        />
+      </div>
+    </div>
+  </body>
+</html>
