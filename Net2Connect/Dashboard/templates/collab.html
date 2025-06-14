@@ -302,11 +302,11 @@
             <div class="status-badge status-ongoing"></div>
             <div class="project-title">{{ project.title }}</div>
             <div class="project-desc">{{ project.description }}</div>
-            <div class="deadline">Deadline: <span>{{ project.deadline }}</span></div>
+            <div class="deadline">Deadline: <span>{{ project.end_date }}</span></div>
             <div class="progress-bar" title="{{ project.completed_tasks }}/{{ project.total_tasks }} tasks completed">
               <div class="progress" style="width: {{ project.progress_percentage }}%"></div>
             </div>
-            <small>{{ project.progress_percentage }}% Complete</small>
+            <small>{{ project.progress_percentage }}50% Complete</small>
           </div>
         </a>
         {% empty %}
@@ -384,7 +384,24 @@
           <label>Maximum Members</label><br>
           <input type="number" name="max_members" min="1" value="1" style="width:100%;padding:8px;margin-bottom:10px">
       </div>
-      
+      <!-- Category -->
+      <div>
+        <label>Project Categories* (Hold Ctrl/Cmd to select multiple)</label><br>
+        <select name="categories" multiple required 
+                style="width:100%;padding:8px;margin-bottom:10px;height:120px;">
+            <option value="web">Web Development</option>
+            <option value="app">Mobile App Development</option>
+            <option value="ml">Machine Learning / AI</option>
+            <option value="ds">Data Science</option>
+            <option value="uiux">UI/UX Design</option>
+            <option value="cyber">Cybersecurity</option>
+            <option value="iot">IoT & Embedded Systems</option>
+            <option value="game">Game Development</option>
+            <option value="blockchain">Blockchain</option>
+            <option value="other">Other</option>
+        </select>
+        <small class="help-text">Hold Ctrl (Windows) or Command (Mac) to select multiple options</small>
+      </div>
       <!-- Fellows Section (for private projects) -->
       <div class="add-fellows-container" id="fellows-container">
           <button type="button" class="add-fellows-btn" id="add-fellows-btn">+ Add Fellows</button>

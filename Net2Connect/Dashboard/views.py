@@ -55,67 +55,42 @@ def logout_view(request):
 @login_required
 def add_project(request):
     if request.method == 'POST':
-        #  Get form data
-        title = request.POST.get('title', '').strip()
-        description = request.POST.get('description', '').strip()
-        start_date = request.POST.get('start_date')
-        end_date = request.POST.get('end_date')
-        access_type = request.POST.get('access_type', 'invite')
-        max_members = request.POST.get('max_members', 1)
-        fellows_input = request.POST.get('fellows', '').strip()
-            
-        
-    #  Validate required fields
-        if not title:
-            messages.error(request, 'Project title is required')
-            return redirect('dashboard:collab')
-            
-        # Convert dates
-        start_date_obj = None
-        end_date_obj = None
         try:
-            if start_date:
-                start_date_obj = datetime.strptime(start_date, '%Y-%m-%d').date()
-            if end_date:
-                end_date_obj = datetime.strptime(end_date, '%Y-%m-%d').date()
-        except ValueError:
-            messages.error(request, 'Invalid date format (use YYYY-MM-DD)')
-            return redirect('dashboard:collab')
+            # Get form data
+            title = request.POST['title']
+            description = request.POST.get('description', '')
+            start_date = request.POST.get('start_date')
+            end_date = request.POST.get('end_date')
+            access_type = request.POST['access_type']
+            max_members = request.POST.get('max_members', 1)
+            category_ids = request.POST.getlist('categories')  # Get list of category IDs
             
-        # Validate dates
-        if start_date_obj and end_date_obj and start_date_obj > end_date_obj:
-            messages.error(request, 'Start date cannot be after end date')
-            return redirect('dashboard:collab')
+            # Create project (without categories first)
+            project = Project.objects.create(
+                owner=request.user,
+                title=title,
+                description=description,
+                start_date=start_date or None,
+                end_date=end_date or None,
+                access_type=access_type,
+                max_members=max_members
+            )
             
-        # Create project
-        project = Project.objects.create(
-            owner=request.user,
-            title=title,
-            description=description,
-            start_date=start_date_obj,
-            end_date=end_date_obj,
-            access_type=access_type,
-            max_members=int(max_members),
-            status='ongoing'
-        )
+            # Add categories (many-to-many relationship)
+            for category_id in category_ids:
+                category = Category.objects.get(id=category_id)
+                project.categories.add(category)
             
-        # Handle members for private projects
-        if access_type == 'invite' and fellows_input:
-            fellows_emails = [email.strip() for email in fellows_input.split(',') if email.strip()]
-            for email in fellows_emails:
-                try:
-                    user = User.objects.get(email=email.lower())
-                    project.members.add(user)
-                except User.DoesNotExist:
-                    # You might want to create invitations for non-existing users
-                    pass
+            project.members.add(request.user)
+            messages.success(request, 'Project created successfully!')
+            return redirect('dashboard:collabs')
             
-        messages.success(request, 'Project created successfully!')
-        # return redirect('dashboard:collab')
-    return render(request, 'add_project.html', {
-
-        # 'privacy_choices': Project.PRIVACY_CHOICES
-    })
+        except Exception as e:
+            messages.error(request, f'Error creating project: {str(e)}')
+            return redirect('dashboard:add_project')
+    
+    categories = Category.objects.all()
+    return render(request, 'add_project.html', {'categories': categories})
 
 # Removed @login_required for testing
 @login_required

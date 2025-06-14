@@ -1,8 +1,9 @@
-from django.db import models
+
 from django.contrib.auth.models import User
+from django.db import models
 
 class Category(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)  # unique to avoid duplicates
     
     def __str__(self):
         return self.name
@@ -17,7 +18,7 @@ class Project(models.Model):
         ('open', 'Open to All'),
         ('invite', 'By Invitation Only'),
     ]
-
+    
     owner = models.ForeignKey(
     User, 
     on_delete=models.CASCADE, 
