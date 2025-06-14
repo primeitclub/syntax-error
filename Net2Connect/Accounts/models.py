@@ -31,7 +31,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='student')
     user_name = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     points = models.IntegerField(default=10)
