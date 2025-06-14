@@ -13,7 +13,6 @@ from django.http import JsonResponse
 from django.db import models
 from Accounts.models import Student
 
-
 def dashboard(request):
     student = Student.objects.filter(user=request.user).first()
     return render(request, 'dashboard.html')
@@ -289,3 +288,6 @@ def home_view(request):
         'student': student_data
     }
     return render(request, 'dashboard.html', context)
+
+def project_ui(request):
+    return render(request, 'project_ui.html')

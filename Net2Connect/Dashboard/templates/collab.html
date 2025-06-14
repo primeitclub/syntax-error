@@ -591,6 +591,13 @@
     .right-btn {
       right: -10px;
     }
+
+    .project-link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+}
+
   }
 </style>
 
@@ -678,26 +685,37 @@
     </button>
     <div class="project-grid">
       {% for project in completed_projects %}
-      <div class="project-card">
-        <div class="card-header">
-          <h3 class="project-title">{{ project.title }}</h3>
-          <span class="status-badge status-completed">Completed</span>
+
+
+
+<a href="{% url 'dashboard:project_detail' project.id %}" style="text-decoration: none; color: inherit;">
+  <div class="project-card">
+    <div class="card-header">
+      <h3 class="project-title">{{ project.title }}</h3>
+      <span class="status-badge status-ongoing">In Progress</span>
+    </div>
+    <p class="project-desc">{{ project.description|default:"No description provided" }}</p>
+    <div class="meta-info">
+      <div class="deadline {% if project.is_urgent %}urgent{% endif %}">
+        <i class="far fa-calendar-alt"></i>
+        <span>Due {{ project.end_date }}</span>
+      </div>
+      <div class="progress-container">
+        <div class="progress-info">
+          <span>{{ project.completed_tasks }}/{{ project.total_tasks }} tasks</span>
+          <span>{{ project.progress_percentage }}%</span>
         </div>
-        <p class="project-desc">{{ project.description|default:"No description provided" }}</p>
-        <div class="meta-info">
-          <div class="deadline">
-            <i class="far fa-check-circle"></i>
-            <span>Completed on {{ project.completed_date }}</span>
-          </div>
-          <div class="progress-container">
-            <div class="progress-info">
-              <span>All tasks completed</span>
-              <span>100%</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress progress-completed" style="width: 100%"></div>
-            </div>
-          </div>
+        <div class="progress-bar">
+          <div class="progress progress-ongoing" style="width: {{ project.progress_percentage }}%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</a>
+
+
+
+
           <div class="members-preview">
             {% for member in project.first_three_members %}
             <div class="member-avatar" title="{{ member.name }}">
