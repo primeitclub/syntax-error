@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      display: flex;
+      height: 100vh;
+      background-color: #f8f8f8;
+      color: #333;
+    }
+    .sidebar {
+      width: 240px;
+      background: white;
+      border-right: 1px solid #ddd;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;;
+    }
+    .sidebar > .companyname{
+        font-weight:bold;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+    }
+    .sidebar ul {
+        list-style: none;
+    }
+    .sidebar li {
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .sidebar li:hover,
+    .sidebar li.active {
+      background-color: #d6f5d6;
+      color: #57C12D;
+    }
+    .toggle-mode {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      padding: 0 1rem;
+    }
+    .main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+    .search-bar button {
+      padding: 0.75rem 1rem;
+      background-color: #B6FF69;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    a {
+      text-decoration: none;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="companyname">Net2Connect</div>
+    <ul>
+      <li><a href="{% url 'feed' %}">Feed</a></li>
+      <li><a href="{% url 'group' %}">Group</a></li>
+      <li><a href="{% url 'collab' %}">Collab</a></li>
+      <li><a href="{% url 'profile' %}">Profile</a></li>
+      <li><a href="{% url 'notification' %}">Notifications</a></li>
+      <li><a href="">Log Out</a></li>
+    </ul>
+  </aside>
+
+  <main class="main">
+    <div class="search-bar">
+      <input type="text" placeholder="Search creators, platforms, content categories...">
+      <button>🔍 ADVANCED SEARCH</button>
+    </div>
+    {% block content %}
+    {% endblock %}
+  </main>
+
+</body>
+</html>

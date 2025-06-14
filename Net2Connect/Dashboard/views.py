@@ -1,14 +1,35 @@
 from django.shortcuts import render
-
-# Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Project, Category
 from django.http import JsonResponse
 from django.db import models
 
-# Create your views here.
+def dashboard(request):
+    return render(request,'dashboard.html')
+
+def feed(request):
+    return render(request,'feed.html')
+
+def collab(request):
+    return render(request,'collab.html')
+
+def group(request):
+    return render(request,'group.html')
+
+def inbox(request):
+    return render(request,'inbox.html')
+
+def notification(request):
+    return render(request,'notification.html')
+
+def settings(request):
+    return render(request,'settings.html')
+
+def logout_view(request):
+    return render(request,'logout.html')
 
 # Removed @login_required for testing
 def add_project(request):
@@ -84,6 +105,7 @@ def project_detail(request, project_id):
     })
 
 # Removed @login_required for testing
+# @login_required
 def project_list(request):
     projects = Project.objects.all()
     return render(request, 'Dashboard/project_list.html', {
