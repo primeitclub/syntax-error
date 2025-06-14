@@ -1,0 +1,71 @@
+{% extends "dashboard.html" %}
+{% block title %}Feed{% endblock %}
+
+{% block content %}
+<style>
+    .creators-section {
+      margin-top: 2rem;
+    }
+    .creators-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .creator-card {
+      background: white;
+      border-radius: 15px;
+      padding: 1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .creator-card img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin-bottom: 0.5rem;
+    }
+    .creator-card h4 {
+      font-size: 1rem;
+    }
+    .creator-card p {
+      font-size: 0.8rem;
+      color: #666;
+    }
+</style>
+    <div class="creators-section">
+      <h3>Trending Creators</h3>
+      <div class="creators-grid">
+        <div class="creator-card">
+          <img src="https://via.placeholder.com/60" alt="Creator 1">
+          <h4>Carla Schleiffer</h4>
+          <p>800K Total Reach</p>
+        </div>
+        <div class="creator-card">
+          <img src="https://via.placeholder.com/60" alt="Creator 2">
+          <h4>Jakob Bergson</h4>
+          <p>800K Total Reach</p>
+        </div>
+        <div class="creator-card">
+          <img src="https://via.placeholder.com/60" alt="Creator 3">
+          <h4>Ruben Dakkis</h4>
+          <p>800K Total Reach</p>
+        </div>
+        <div class="creator-card">
+          <img src="https://via.placeholder.com/60" alt="Creator 4">
+          <h4>Justin Ekstrom</h4>
+          <p>800K Total Reach</p>
+        </div>
+        <div class="creator-card">
+          <img src="https://via.placeholder.com/60" alt="Creator 5">
+          <h4>Maren Horwitz</h4>
+          <p>800K Total Reach</p>
+        </div>
+        <div class="creator-card">
+          <img src="https://via.placeholder.com/60" alt="Creator 6">
+          <h4>Hanna Gouse</h4>
+          <p>800K Total Reach</p>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
