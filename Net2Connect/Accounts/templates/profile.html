@@ -43,13 +43,6 @@
         margin-top: 1.5rem;
         margin-bottom: 0.5rem;
     }
-    .profile-info {
-        margin-bottom: 1rem;
-        line-height: 1.6;
-    }
-    .profile-info strong {
-        color: #4a5568;
-    }
     .skill-badge {
         background-color: #bee3f8;
         color: #2c5282;
@@ -68,6 +61,32 @@
     .social-links a:hover {
         text-decoration: underline;
     }
+
+    .profile-info{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+    .profile-info table th,
+    .profile-info table td {
+        padding: 0.2rem 0.5rem;
+        vertical-align: top;
+        text-align: left;
+    }
+
+    .profile-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .profile-info table th,
+    .profile-info table td {
+        padding: 0.2rem 0.5rem;
+        vertical-align: top;
+        text-align: left;
+    }
+
 </style>
 
 <div class="container my-5">
@@ -83,11 +102,27 @@
                 </div>
                 <div class="profile-body text-start">
                     <div class="profile-info">
-    <strong>Username:</strong> {{ student.username }}<br>
-    <strong>Email:</strong> {{ student.email }}<br>
-    <strong>Address:</strong> {{ student.address|default:"N/A" }}<br>
-    <strong>Connections:</strong><a href="{%url 'connections:connected_list'  %}">{{ student.connections_count }}</a> 
-</div>
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <th class="text-left">Username:</th>
+                                    <td class="text-left">{{ student.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-left">Email:</th>
+                                    <td class="text-left">{{ student.email }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-left">Address:</th>
+                                    <td class="text-left">{{ student.address|default:"N/A" }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-left">Connections:</th>
+                                    <td class="text-left">{{ student.connections_count }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="social-links mt-3">
                         {% if student.website_url %}
@@ -125,10 +160,19 @@
 
                     <h5 class="profile-section-title">Activity</h5>
                     <div class="profile-info">
-                        <strong>Joined:</strong> {{ student.date_joined|date:"F d, Y" }}<br>
-                        <strong>Last Active:</strong> {{ student.last_active|default:"N/A" }}
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <th class="text-left">Joined:</th>
+                                    <td class="text-left">{{ student.date_joined|date:"F d, Y" }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="text-left">Last Active:</th>
+                                    <td class="text-left">{{ student.last_active|default:"N/A" }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-
                     <div class="text-end mt-4">
                         <a href="{% url 'account:edit_profile' %}" class="btn btn-primary px-4">Edit Profile</a>
                     </div>
