@@ -1,71 +1,174 @@
 {% extends "dashboard.html" %}
 {% block title %}Feed{% endblock %}
-
+{% block search %}
+<div class="search-bar mb-3">
+  <form method="GET" action="{% url 'dashboard:feed' %}" class="d-flex align-items-center w-100">
+    <input type="text" name="q" placeholder="Search creators, projects, skills..." 
+           value="{{ search_query|default:'' }}" class="form-control mr-2">
+    <button type="submit" class="btn btn-outline-primary">🔍 Search</button>
+  </form>
+</div>
+{% endblock %}
 {% block content %}
 <style>
-    .creators-section {
-      margin-top: 2rem;
-    }
-    .creators-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-    .creator-card {
-      background: white;
-      border-radius: 15px;
-      padding: 1rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-    .creator-card img {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      margin-bottom: 0.5rem;
-    }
-    .creator-card h4 {
-      font-size: 1rem;
-    }
-    .creator-card p {
-      font-size: 0.8rem;
-      color: #666;
-    }
+  /* your existing styles here */
+  .search-bar {
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  .search-bar input[type="text"] {
+    flex-grow: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    font-size: 1rem;
+  }
+  .search-bar button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 0 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .search-bar button:hover {
+    background-color: #0056b3;
+  }
 </style>
-    <div class="creators-section">
-      <h3>Trending Creators</h3>
-      <div class="creators-grid">
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 1">
-          <h4>Carla Schleiffer</h4>
-          <p>800K Total Reach</p>
-        </div>
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 2">
-          <h4>Jakob Bergson</h4>
-          <p>800K Total Reach</p>
-        </div>
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 3">
-          <h4>Ruben Dakkis</h4>
-          <p>800K Total Reach</p>
-        </div>
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 4">
-          <h4>Justin Ekstrom</h4>
-          <p>800K Total Reach</p>
-        </div>
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 5">
-          <h4>Maren Horwitz</h4>
-          <p>800K Total Reach</p>
-        </div>
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 6">
-          <h4>Hanna Gouse</h4>
-          <p>800K Total Reach</p>
-        </div>
-      </div>
-    </div>
 
+
+<div class="container py-4">
+
+
+  <h3 class="mb-3">🚀 Suggested Projects for You</h3>
+  {% if suggested_projects %}
+    <div class="row">
+      {% for project in suggested_projects %}
+        <div class="col-md-6 mb-4">
+          <div class="card shadow-sm rounded p-3">
+            <h5>{{ project.title }}</h5>
+            <p>{{ project.description|truncatewords:25 }}</p>
+            <p><strong>Fields:</strong> {{ project.required_fields }}</p>
+            <p><strong>Skills:</strong>
+              {% for skill in project.required_skills.all %}
+                <span class="badge badge-info">{{ skill.name }}</span>
+              {% empty %}
+                <em>No skills specified</em>
+              {% endfor %}
+            </p>
+            <a href="#" 
+               class="btn btn-outline-primary btn-sm mt-2 join-project-btn" 
+               data-project-id="{{ project.id }}">
+               🔗 Join
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No matching projects found.</p>
+  {% endif %}
+
+  <div class="creators-section mt-5">
+    <h3 class="mb-3">🤝 Suggested Collaborators</h3>
+    {% if suggested_creators %}
+      <div class="creators-grid">
+        {% for s in suggested_creators %}
+          <div class="creator-card">
+            <img src="https://ui-avatars.com/api/?name={{ s.full_name|urlencode }}&background=random" alt="Avatar">
+            <h4>{{ s.full_name }}</h4>
+            <p>@{{ s.username }}</p>
+            <p>{{ s.interest_fields }}</p>
+            <div>
+              {% for skill in s.skills.all|slice:":4" %}
+                <span class="badge badge-light border">{{ skill.name }}</span>
+              {% empty %}
+                <em>No skills</em>
+              {% endfor %}
+            </div>
+            <a href="#" 
+               class="btn btn-sm btn-outline-success mt-2 connect-btn" 
+               data-user-id="{{ s.user.id }}">
+               Connect
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No suggested collaborators found.</p>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+// Function to get CSRF token from cookie
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+const csrftoken = getCookie('csrftoken');
+
+// Handle Connect button clicks
+document.querySelectorAll('.connect-btn').forEach(button => {
+  button.addEventListener('click', function(e) {
+    e.preventDefault();
+    const userId = this.dataset.userId;
+    fetch(`/connections/send/${userId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert(data.success);
+        this.disabled = true;
+        this.textContent = "Request Sent";
+      } else {
+        alert(data.error || "Error sending request");
+      }
+    });
+  });
+});
+
+// Handle Join Project button clicks
+document.querySelectorAll('.join-project-btn').forEach(button => {
+  button.addEventListener('click', function(e) {
+    e.preventDefault();
+    const projectId = this.dataset.projectId;
+    fetch(`/dashboard/join_request/${projectId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert(data.success);
+        this.disabled = true;
+        this.textContent = "Requested";
+      } else {
+        alert(data.error || "Error sending join request");
+      }
+    });
+  });
+});
+</script>
 {% endblock %}

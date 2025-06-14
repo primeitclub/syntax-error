@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from django.utils import timezone
+from Accounts.models import Skill
 class Category(models.Model):
     name = models.CharField(max_length=100)
     
@@ -36,6 +37,13 @@ class Project(models.Model):
 
     members = models.ManyToManyField(User, related_name='joined_projects', blank=True)
     invited_users = models.ManyToManyField(User, related_name='invited_projects', blank=True)
+
+    # 🔥 Required for Smart Matching:
+    required_skills = models.ManyToManyField(Skill, blank=True)
+    required_fields = models.CharField(
+        max_length=255, blank=True, null=True,
+        help_text="Comma-separated fields like Web Development, AI, ML"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
