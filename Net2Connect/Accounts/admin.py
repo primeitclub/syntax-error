@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Student, Skill, Project
+from .models import Student, Skill
 
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('user_name', 'email', 'points', 'date_joined')
@@ -26,4 +26,4 @@ admin.site.register(Student, StudentAdmin)
 
 # Register other models normally
 admin.site.register(Skill)
-admin.site.register(Project)
+

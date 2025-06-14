@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">My Collaborations</h1>
+
+    <!-- Ongoing Projects Section -->
+    <div class="mb-12">
+        <h2 class="text-2xl font-semibold mb-4">Ongoing Projects</h2>
+        {% if ongoing_projects %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for project in ongoing_projects %}
+                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                        <h3 class="text-xl font-semibold mb-2">{{ project.title }}</h3>
+                        <p class="text-gray-600 mb-4">{{ project.description|truncatewords:30 }}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">
+                                Started: {{ project.start_date|date:"M d, Y" }}
+                            </span>
+                            <a href="{% url 'project_detail' project.id %}" 
+                               class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-gray-50 rounded-lg p-6 text-center">
+                <p class="text-gray-600">No ongoing projects found.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Completed Projects Section -->
+    <div>
+        <h2 class="text-2xl font-semibold mb-4">Completed Projects</h2>
+        {% if completed_projects %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for project in completed_projects %}
+                    <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                        <h3 class="text-xl font-semibold mb-2">{{ project.title }}</h3>
+                        <p class="text-gray-600 mb-4">{{ project.description|truncatewords:30 }}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">
+                                Completed: {{ project.end_date|date:"M d, Y" }}
+                            </span>
+                            <a href="{% url 'project_detail' project.id %}" 
+                               class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-gray-50 rounded-lg p-6 text-center">
+                <p class="text-gray-600">No completed projects found.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

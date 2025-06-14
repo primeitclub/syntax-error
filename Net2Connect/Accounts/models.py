@@ -27,14 +27,7 @@ class Skill(models.Model):
 # Project Model
 
 
-class Project(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
 
-    def __str__(self):
-        return self.title
 
 # Student Model
 class Student(models.Model):
@@ -49,7 +42,7 @@ class Student(models.Model):
     date_joined = models.DateTimeField(default=timezone.now)
     last_active = models.DateTimeField(null=True, blank=True)
     skills = models.ManyToManyField(Skill, blank=True)
-    projects = models.ManyToManyField(Project, blank=True)
+   
 
     def __str__(self):
         return self.user.username
