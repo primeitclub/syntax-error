@@ -1,5 +1,8 @@
+from django.shortcuts import render
+
+# Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib import messages
 from .models import Project, Category
 from django.http import JsonResponse
@@ -7,7 +10,7 @@ from django.db import models
 
 # Create your views here.
 
-@login_required
+# Removed @login_required for testing
 def add_project(request):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -16,15 +19,21 @@ def add_project(request):
         privacy = request.POST.get('privacy')
         
         try:
+            # For testing, use the first user in the database
+            test_user = User.objects.first()
+            if not test_user:
+                messages.error(request, 'No test user found in database')
+                return redirect('add_project')
+                
             category = Category.objects.get(id=category_id)
             project = Project.objects.create(
                 title=title,
                 category=category,
                 description=description,
                 privacy=privacy,
-                created_by=request.user
+                created_by=test_user
             )
-            project.members.add(request.user)  # Add creator as a member
+            project.members.add(test_user)
             messages.success(request, 'Project created successfully!')
             return redirect('project_detail', project_id=project.id)
         except Exception as e:
@@ -37,14 +46,9 @@ def add_project(request):
         'privacy_choices': Project.PRIVACY_CHOICES
     })
 
-@login_required
+# Removed @login_required for testing
 def update_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
-    
-    # Check if user is the creator or a member
-    if request.user != project.created_by and request.user not in project.members.all():
-        messages.error(request, 'You do not have permission to update this project.')
-        return redirect('project_list')
     
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -72,21 +76,16 @@ def update_project(request, project_id):
         'privacy_choices': Project.PRIVACY_CHOICES
     })
 
-@login_required
+# Removed @login_required for testing
 def project_detail(request, project_id):
     project = get_object_or_404(Project, id=project_id)
     return render(request, 'Dashboard/project_detail.html', {
         'project': project
     })
 
-@login_required
+# Removed @login_required for testing
 def project_list(request):
-    # Get projects where user is creator or member
-    user_projects = Project.objects.filter(
-        models.Q(created_by=request.user) | 
-        models.Q(members=request.user)
-    ).distinct()
-    
+    projects = Project.objects.all()
     return render(request, 'Dashboard/project_list.html', {
-        'projects': user_projects
+        'projects': projects
     })

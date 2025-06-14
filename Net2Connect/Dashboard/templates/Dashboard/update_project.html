@@ -18,18 +18,7 @@
         {% csrf_token %}
         <div class="mb-3">
             <label for="title" class="form-label">Project Title</label>
-            <input type="text" class="form-control" id="title" name="title" value="{{ project.title }}" required>
-        </div>
-        
-        <div class="mb-3">
-            <label for="category" class="form-label">Category</label>
-            <select class="form-select" id="category" name="category" required>
-                {% for category in categories %}
-                <option value="{{ category.id }}" {% if category.id == project.category.id %}selected{% endif %}>
-                    {{ category.name }}
-                </option>
-                {% endfor %}
-            </select>
+            <input type="text" class="form-control" id="title" name="title" value="{{ project.title }}" maxlength="200" required>
         </div>
         
         <div class="mb-3">
@@ -38,14 +27,15 @@
         </div>
         
         <div class="mb-3">
-            <label for="privacy" class="form-label">Privacy Setting</label>
+            <label for="privacy" class="form-label">Project Visibility</label>
             <select class="form-select" id="privacy" name="privacy" required>
-                {% for value, label in privacy_choices %}
-                <option value="{{ value }}" {% if value == project.privacy %}selected{% endif %}>
-                    {{ label }}
-                </option>
-                {% endfor %}
+                <option value="private" {% if project.privacy == 'private' %}selected{% endif %}>Private</option>
+                <option value="public" {% if project.privacy == 'public' %}selected{% endif %}>Public</option>
             </select>
+            <div class="form-text">
+                Private: Only invited members can join<br>
+                Public: Anyone can join
+            </div>
         </div>
         
         <button type="submit" class="btn btn-primary">Update Project</button>

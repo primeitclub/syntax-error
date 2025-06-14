@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+
 
 {% block content %}
 <div class="container mt-4">
@@ -18,17 +18,7 @@
         {% csrf_token %}
         <div class="mb-3">
             <label for="title" class="form-label">Project Title</label>
-            <input type="text" class="form-control" id="title" name="title" required>
-        </div>
-        
-        <div class="mb-3">
-            <label for="category" class="form-label">Category</label>
-            <select class="form-select" id="category" name="category" required>
-                <option value="">Select a category</option>
-                {% for category in categories %}
-                <option value="{{ category.id }}">{{ category.name }}</option>
-                {% endfor %}
-            </select>
+            <input type="text" class="form-control" id="title" name="title" maxlength="200" required>
         </div>
         
         <div class="mb-3">
@@ -37,12 +27,15 @@
         </div>
         
         <div class="mb-3">
-            <label for="privacy" class="form-label">Privacy Setting</label>
+            <label for="privacy" class="form-label">Project Visibility</label>
             <select class="form-select" id="privacy" name="privacy" required>
-                {% for value, label in privacy_choices %}
-                <option value="{{ value }}">{{ label }}</option>
-                {% endfor %}
+                <option value="private" selected>Private</option>
+                <option value="public">Public</option>
             </select>
+            <div class="form-text">
+                Private: Only invited members can join<br>
+                Public: Anyone can join
+            </div>
         </div>
         
         <button type="submit" class="btn btn-primary">Create Project</button>
