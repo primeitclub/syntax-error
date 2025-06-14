@@ -1,9 +1,16 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseForbidden
-# Create your views here.
-@login_required(login_url='/')
+from django.http import HttpResponse
+from Accounts.models import Student
+
+@login_required(login_url='/')  
 def home_view(request):
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden("You are not allowed to access this page.")
-    return render(request, 'home.html')
+    student_data = Student.objects.filter(user=request.user).first()
+
+    if not student_data:
+        return HttpResponse("Student profile not found. Please contact admin.", status=404)
+
+    context = {
+        'student': student_data
+    }
+    return render(request, 'home.html', context)
