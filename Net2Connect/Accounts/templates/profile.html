@@ -1,0 +1,179 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        width: 100%;
+        }
+
+        .background {
+            width: 100%;
+            height: 87vh;
+
+            margin-top:75px;
+            
+            display: flex;
+            justify-content: center;
+            align-items: top;
+        }
+
+        .background > .profilecontainer {
+            height: 280px;
+            width: 50%;
+            margin-top: 20px;
+            padding: 10px;
+
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Horizontal, Vertical, Blur, Color */
+            background-color: #fff;
+        }
+
+        .background > .profilecontainer >.containerheader> .profiletitle {
+            font-family: Pangea Afrikan Text Trial;
+            font-size: 28px;
+            font-weight: 550;
+
+            text-align: center;
+            margin: 10px 0px 10px 0px;
+        }
+
+        .background > .profilecontainer>.containerheader{
+            display: flex;
+            flex-direction:row;
+            align-items: center;
+            justify-content:space-between;
+        }
+
+        .background > .profilecontainer>.containerheader div{
+            height:90%;
+            width:33.3%;
+        }
+
+        .background > .profilecontainer>.containerheader>.backarrow{
+            display:flex;
+            align-items:center;
+            justify-content:flex-end;
+        }
+
+        .background > .profilecontainer>.containerheader>.backarrow img{
+            height:28px;
+            width:28px; 
+            background-position:center;
+            background-repeat:no-repeat;    
+        }
+
+
+        .background > .profilecontainer > .containerbody {
+            height: 95%;
+            width: 100%;
+        }
+
+        .background > .profilecontainer > .containerbody > .bodytable {
+            height: 80%;
+            width: 98%;
+
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        
+        .background > .profilecontainer > .containerbody > .bodytable td {
+            height: 125px;
+            width: 175px;
+            vertical-align: top;
+            font-size: 16px;
+            font-family: Pangea Afrikan Text Trial;
+            text-align: center;              
+        }
+
+        .background > .profilecontainer > .containerbody > .bodytable #pic-con{
+            vertical-align:top;
+        }
+        
+        .background > .profilecontainer > .containerbody>.bodytable #profilepic {
+            height: 145px;
+            width: 145px;
+            border: 3px solid black;
+            border-radius: 25%;
+            margin-bottom:30px;
+
+            background-position:center;
+            background-size:cover;
+        }
+
+        /*............................................Profile Details............................................................*/
+        .background > .profilecontainer > .containerbody > .bodytable #profiledetails{
+            width:450px;
+            vertical-align: top;
+        }
+        .background > .profilecontainer > .containerbody > .bodytable td table{
+            width: 100%;
+            border-collapse: collapse;
+            vertical-align: top;
+            /* border:1px solid red;    */
+        }
+        .background > .profilecontainer > .containerbody > .bodytable td table td{
+            height:35px;
+            padding: 8px;
+            border-collapse: collapse;
+            /* border:1px solid red;    */
+
+            font-size: 16px;
+            font-family: Pangea Afrikan Text Trial;
+            text-align:left;
+        }
+
+    </style>
+    </head>
+
+    <body>
+        <div class="background">
+            <div class="profilecontainer">
+                
+                <div class="containerheader">
+                    <div></div>
+                    <div class="profiletitle">Profile</div>
+                    <div class="backarrow">
+                        <img src="{% static '/images/backarrow.png' %}" alt=""></a>
+                    </div>
+                </div>
+
+                <div class="containerbody">
+                <table class="bodytable" cellpadding="10">
+                    <tr>
+                        <td id="pic-con">
+                            <img src="{% static '/images/user.png' %}" alt="" id="profilepic">
+                        </td>
+                            
+                        <td id="profiledetails">
+                                <table>
+                                    <tr>
+                                        <td>Empty: Empty</td>
+                                        <td>Empty: Empty</td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <td>Empty: Empty</td>
+                                        <td>Empty: Empty</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Empty: Empty </td>
+                                        <td>Empty: Empty</td>
+                                    </tr>
+                                </table>
+                        </td>
+                    </tr>
+                </table>
+                </div>
+
+            </div>
+        </div>
+    </body>
+
+</html>
