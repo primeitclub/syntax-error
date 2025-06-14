@@ -1,6 +1,6 @@
 {% extends "dashboard.html" %}
 {% load static %}
-{% block title %}Profile{% endblock %}
+{% block title %}View Profile{% endblock %}
 {% block content %}
 <style>
     body {
@@ -83,11 +83,14 @@
                 </div>
                 <div class="profile-body text-start">
                     <div class="profile-info">
-    <strong>Username:</strong> {{ student.username }}<br>
-    <strong>Email:</strong> {{ student.email }}<br>
-    <strong>Address:</strong> {{ student.address|default:"N/A" }}<br>
-    <strong>Connections:</strong><a href="{%url 'connections:connected_list'  %}">{{ student.connections_count }}</a> 
-</div>
+                        <strong>Username:</strong> {{ student.username }}<br>
+                        <strong>Email:</strong> {{ student.email }}<br>
+                        <strong>Address:</strong> {{ student.address|default:"N/A" }}<br>
+                        <strong>Connections:</strong>
+                        <a href="{% url 'connections:connected_list' %}">
+                            {{ student.connections_count }}
+                        </a>
+                    </div>
 
                     <div class="social-links mt-3">
                         {% if student.website_url %}
@@ -127,10 +130,6 @@
                     <div class="profile-info">
                         <strong>Joined:</strong> {{ student.date_joined|date:"F d, Y" }}<br>
                         <strong>Last Active:</strong> {{ student.last_active|default:"N/A" }}
-                    </div>
-
-                    <div class="text-end mt-4">
-                        <a href="{% url 'account:edit_profile' %}" class="btn btn-primary px-4">Edit Profile</a>
                     </div>
                 </div>
             </div>

@@ -1,65 +1,175 @@
 {% extends "dashboard.html" %}
 {% block title %}Feed{% endblock %}
+
 {% block search %}
-<div class="search-bar mb-3">
-  <form method="GET" action="{% url 'dashboard:feed' %}" class="d-flex align-items-center w-100">
-    <input type="text" name="q" placeholder="Search creators, projects, skills..." 
-           value="{{ search_query|default:'' }}" class="form-control mr-2">
-    <button type="submit" class="btn btn-outline-primary">🔍 Search</button>
+<div class="search-bar mb-4">
+  <form method="GET" action="{% url 'dashboard:feed' %}" class="d-flex w-100 gap-2">
+    <input type="search" name="q" placeholder="Search creators, projects, skills..." 
+           value="{{ search_query|default:'' }}" class="form-control rounded-pill px-4">
+    <button type="submit" class="btn btn-primary rounded-pill px-4">🔍 Search</button>
   </form>
 </div>
 {% endblock %}
+
 {% block content %}
 <style>
-  /* your existing styles here */
-  .search-bar {
-    margin-bottom: 2rem;
+  /* Container spacing */
+  .container {
+    max-width: 960px;
+  }
+
+  /* Project Cards */
+  .project-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgb(0 0 0 / 0.08);
+    padding: 1.25rem 1.5rem;
+    transition: box-shadow 0.3s ease;
+    height: 100%;
     display: flex;
-    gap: 0.5rem;
+    flex-direction: column;
+    justify-content: space-between;
   }
-  .search-bar input[type="text"] {
-    flex-grow: 1;
-    padding: 0.5rem 1rem;
-    border: 1px solid #ccc;
-    border-radius: 25px;
-    font-size: 1rem;
+  .project-card:hover {
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.15);
   }
-  .search-bar button {
-    background-color: #007bff;
-    border: none;
-    color: white;
-    padding: 0 1rem;
-    border-radius: 25px;
-    cursor: pointer;
+  .project-card h5 {
     font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1a202c;
   }
-  .search-bar button:hover {
-    background-color: #0056b3;
+  .project-card p {
+    color: #4a5568;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    flex-grow: 1;
+  }
+  .project-card .badge {
+    margin-right: 0.3rem;
+    font-size: 0.75rem;
+    background-color: #3182ce;
+  }
+  .project-card a.join-btn {
+    align-self: flex-start;
+    margin-top: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #3182ce;
+    border: 2px solid #3182ce;
+    padding: 0.3rem 0.9rem;
+    border-radius: 30px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .project-card a.join-btn:hover:not(:disabled) {
+    background-color: #3182ce;
+    color: white;
+    text-decoration: none;
+  }
+  .project-card a.join-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Creators Grid */
+  .creators-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(230px,1fr));
+    gap: 1.25rem;
+  }
+  .creator-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgb(0 0 0 / 0.08);
+    padding: 1rem 1.25rem;
+    text-align: center;
+    transition: box-shadow 0.3s ease;
+  }
+  .creator-card:hover {
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.15);
+  }
+  .creator-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.7rem;
+    box-shadow: 0 1px 5px rgb(0 0 0 / 0.12);
+  }
+  .creator-card h4 {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    color: #2d3748;
+  }
+  .creator-card p.username {
+    color: #718096;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+  }
+  .creator-card p.interests {
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin-bottom: 0.6rem;
+    min-height: 2.6em; /* keep consistent height */
+  }
+  .creator-card .badge {
+    font-size: 0.7rem;
+    color: #2c5282;
+    background-color: #bee3f8;
+    margin: 0.15rem 0.15rem 0 0;
+  }
+  .creator-card a.connect-btn {
+    margin-top: 0.75rem;
+    display: inline-block;
+    font-weight: 600;
+    padding: 0.35rem 1rem;
+    color: #2f855a;
+    border: 2px solid #2f855a;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  .creator-card a.connect-btn:hover:not(:disabled) {
+    background-color: #2f855a;
+    color: white;
+    text-decoration: none;
+  }
+  .creator-card a.connect-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Empty state */
+  .empty-state {
+    color: #718096;
+    font-style: italic;
+    font-weight: 500;
+    margin-top: 1rem;
   }
 </style>
 
-
 <div class="container py-4">
 
-
-  <h3 class="mb-3">🚀 Suggested Projects for You</h3>
+  <h3 class="mb-4">🚀 Suggested Projects for You</h3>
   {% if suggested_projects %}
-    <div class="row">
+    <div class="row g-4">
       {% for project in suggested_projects %}
-        <div class="col-md-6 mb-4">
-          <div class="card shadow-sm rounded p-3">
+        <div class="col-md-6">
+          <div class="project-card">
             <h5>{{ project.title }}</h5>
             <p>{{ project.description|truncatewords:25 }}</p>
             <p><strong>Fields:</strong> {{ project.required_fields }}</p>
-            <p><strong>Skills:</strong>
-              {% for skill in project.required_skills.all %}
-                <span class="badge badge-info">{{ skill.name }}</span>
-              {% empty %}
+            <p>
+              <strong>Skills:</strong>
+              {% if project.required_skills.all %}
+                {% for skill in project.required_skills.all %}
+                  <span class="badge">{{ skill.name }}</span>
+                {% endfor %}
+              {% else %}
                 <em>No skills specified</em>
-              {% endfor %}
+              {% endif %}
             </p>
             <a href="#" 
-               class="btn btn-outline-primary btn-sm mt-2 join-project-btn" 
+               class="join-btn" 
                data-project-id="{{ project.id }}">
                🔗 Join
             </a>
@@ -68,28 +178,30 @@
       {% endfor %}
     </div>
   {% else %}
-    <p>No matching projects found.</p>
+    <p class="empty-state">No matching projects found.</p>
   {% endif %}
 
   <div class="creators-section mt-5">
-    <h3 class="mb-3">🤝 Suggested Collaborators</h3>
+    <h3 class="mb-4">🤝 Suggested Collaborators</h3>
     {% if suggested_creators %}
       <div class="creators-grid">
         {% for s in suggested_creators %}
           <div class="creator-card">
-            <img src="https://ui-avatars.com/api/?name={{ s.full_name|urlencode }}&background=random" alt="Avatar">
+            <img src="https://ui-avatars.com/api/?name={{ s.full_name|urlencode }}&background=random&rounded=true&size=128" alt="{{ s.full_name }}">
             <h4>{{ s.full_name }}</h4>
-            <p>@{{ s.username }}</p>
-            <p>{{ s.interest_fields }}</p>
+            <p class="username">@{{ s.username }}</p>
+            <p class="interests">{{ s.interest_fields|default:"No interests specified." }}</p>
             <div>
-              {% for skill in s.skills.all|slice:":4" %}
-                <span class="badge badge-light border">{{ skill.name }}</span>
-              {% empty %}
+              {% if s.skills.all %}
+                {% for skill in s.skills.all|slice:":4" %}
+                  <span class="badge">{{ skill.name }}</span>
+                {% endfor %}
+              {% else %}
                 <em>No skills</em>
-              {% endfor %}
+              {% endif %}
             </div>
             <a href="#" 
-               class="btn btn-sm btn-outline-success mt-2 connect-btn" 
+               class="connect-btn" 
                data-user-id="{{ s.user.id }}">
                Connect
             </a>
@@ -97,13 +209,12 @@
         {% endfor %}
       </div>
     {% else %}
-      <p>No suggested collaborators found.</p>
+      <p class="empty-state">No suggested collaborators found.</p>
     {% endif %}
   </div>
 </div>
 
 <script>
-// Function to get CSRF token from cookie
 function getCookie(name) {
   let cookieValue = null;
   if (document.cookie && document.cookie !== '') {
@@ -118,10 +229,8 @@ function getCookie(name) {
   }
   return cookieValue;
 }
-
 const csrftoken = getCookie('csrftoken');
 
-// Handle Connect button clicks
 document.querySelectorAll('.connect-btn').forEach(button => {
   button.addEventListener('click', function(e) {
     e.preventDefault();
@@ -146,8 +255,7 @@ document.querySelectorAll('.connect-btn').forEach(button => {
   });
 });
 
-// Handle Join Project button clicks
-document.querySelectorAll('.join-project-btn').forEach(button => {
+document.querySelectorAll('.join-btn').forEach(button => {
   button.addEventListener('click', function(e) {
     e.preventDefault();
     const projectId = this.dataset.projectId;

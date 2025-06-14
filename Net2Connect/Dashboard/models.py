@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from Accounts.models import Skill
-class Category(models.Model):
+class Categories(models.Model):
     name = models.CharField(max_length=100)
     
     def __str__(self):

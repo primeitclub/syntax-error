@@ -3,8 +3,7 @@ from . import views
 app_name = 'dashboard'  
 urlpatterns = [
 
-    path('', views.home_view, name='home'),
-    path('feed/',views.feed,name="feed"),
+    path('',views.feed,name="feed"),
     path('group/',views.group,name="group"),
     path('collab/',views.collab,name="collab"),
     path('inbox/',views.dashboard,name="inbox"),

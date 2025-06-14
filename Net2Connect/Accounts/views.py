@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Student, EmailOTP
@@ -107,7 +108,7 @@ def register_view(request):
         # Save user ID in session
         request.session['pending_user_id'] = user.id
 
-        return redirect('verify_otp')
+        return redirect('account:verify_otp')
 
     return render(request, 'registration/register.html')
 
@@ -121,10 +122,15 @@ def logout_view(request):
 def profile(request):
     student = Student.objects.filter(user=request.user).first()
     student.last_active = timezone.now()
-    points = student.points
-    if points < 0:
+
+    if student.points < 0:
         student.points = 0
-    return render(request, 'profile.html', {'student': student})
+
+    student.save()
+
+    return render(request, 'profile.html', {
+        'student': student,
+    })
 
 
 @login_required
@@ -151,7 +157,8 @@ def editprofile(request):
         student.interest_fields = interest_fields
 
         skills_ids = request.POST.getlist('skills')  # existing skill IDs
-        new_skills_raw = request.POST.get('new_skills', '')  # comma separated string
+        new_skills_raw = request.POST.get(
+            'new_skills', '')  # comma separated string
 
     # Fetch existing skills by ID
         skills_objs = list(Skill.objects.filter(id__in=skills_ids))
@@ -159,11 +166,13 @@ def editprofile(request):
         # Process new skills if any
         if new_skills_raw:
             # Split by comma, strip spaces, ignore empty strings
-            new_skill_names = [name.strip() for name in new_skills_raw.split(',') if name.strip()]
-            
+            new_skill_names = [name.strip()
+                               for name in new_skills_raw.split(',') if name.strip()]
+
             # For each new skill name, check if it exists, if not create
             for skill_name in new_skill_names:
-                skill_obj, created = Skill.objects.get_or_create(name__iexact=skill_name, defaults={'name': skill_name})
+                skill_obj, created = Skill.objects.get_or_create(
+                    name__iexact=skill_name, defaults={'name': skill_name})
                 skills_objs.append(skill_obj)
 
         # Set all skills (existing + new) to student

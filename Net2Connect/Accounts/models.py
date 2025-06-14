@@ -26,24 +26,31 @@ class Skill(models.Model):
 
 
 
-# Student Model
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_name = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     points = models.IntegerField(default=10)
-    
+
     address = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     interest_fields = models.CharField(max_length=255, blank=True, null=True)
-    number_of_connections = models.IntegerField(default=0)
+    
+    # REMOVE: number_of_connections
+    # REPLACE WITH:
+    connections = models.ManyToManyField("self", symmetrical=True, blank=True)
+
     website_url = models.URLField(blank=True, null=True)
     github_url = models.URLField(blank=True, null=True)
     linkedin_url = models.URLField(blank=True, null=True)
 
     date_joined = models.DateTimeField(default=timezone.now)
     last_active = models.DateTimeField(null=True, blank=True)
-    skills = models.ManyToManyField(Skill, blank=True)
+    skills = models.ManyToManyField('Skill', blank=True)
 
     def __str__(self):
         return self.user.username
@@ -51,7 +58,7 @@ class Student(models.Model):
     @property
     def username(self):
         return self.user.username
-    
+
     @property
     def full_name(self):
         return f"{self.user.first_name} {self.user.last_name}"
@@ -68,10 +75,13 @@ class Student(models.Model):
             self.github_url,
             self.linkedin_url,
         ]
-
         return all(is_nonempty(field) for field in required_fields) and self.skills.exists()
 
-    
+    @property
+    def connections_count(self):
+        return self.connections.count()
+
+
 # EMail OTP
 class EmailOTP(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

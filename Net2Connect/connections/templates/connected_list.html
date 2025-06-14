@@ -1,0 +1,30 @@
+{% extends "dashboard.html" %}
+{% block title %}My Connections{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">My Connections</h2>
+
+  {% if connections %}
+    <ul class="list-group">
+      {% for conn in connections %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ conn.full_name }}</strong><br>
+            <small>{{ conn.email }}</small>
+          </div>
+          <div>
+            <a href="{% url 'connections:view_profile' conn.user.id %}" class="btn btn-primary btn-sm">View Profile</a>
+            <form method="POST" action="{% url 'connections:delete_connection' conn.user.id %}" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>You have no connections yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

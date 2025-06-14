@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Project, Category
-
+from .models import Project, Categories
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ('title', 'status', 'owner', 'start_date', 'end_date', 'points')
     list_filter = ('status', 'access_type', 'created_at')
@@ -26,4 +25,4 @@ class ProjectAdmin(admin.ModelAdmin):
     )
 
 admin.site.register(Project, ProjectAdmin)
-admin.site.register(Category)
+admin.site.register(Categories)
