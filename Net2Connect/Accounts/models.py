@@ -34,7 +34,7 @@ class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_name = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
-    points = models.IntegerField(default=0)
+    points = models.IntegerField(default=10)
     
     address = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)

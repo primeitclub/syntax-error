@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from .models import Student, EmailOTP
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -23,10 +24,11 @@ def login_view(request):
         except User.DoesNotExist:
             error = 'Email not found'
         else:
-            user = authenticate(request, username=user.username, password=password)
+            user = authenticate(
+                request, username=user.username, password=password)
             # print(f"User active status: {user.is_active}")
             if user is not None:
-                
+
                 login(request, user)
                 return redirect('/dashboard')
             else:
@@ -95,7 +97,7 @@ def register_view(request):
         send_mail(
             subject="Your OTP Code for Hamro HR",
             message=f"Hello {first_name},\n\nYour OTP code is: {otp_code}\n\nIt will expire in 10 minutes.\n\nThank you!",
-            from_email="Employee Management System <hamrohr.webapp@gmail.com>",
+            from_email="Net2Connect <hamrohr.webapp@gmail.com>",
             recipient_list=[email],
             fail_silently=False
         )
@@ -116,8 +118,35 @@ def logout_view(request):
 
 def profile(request):
     student = Student.objects.filter(user=request.user).first()
-    return render(request,'profile.html', {'student': student})
+    student.last_active = timezone.now()
+    points = student.points
+    if points < 0:
+        student.points = 0
+    return render(request, 'profile.html', {'student': student})
 
+
+@login_required
 def editprofile(request):
     student = Student.objects.filter(user=request.user).first()
-    return render(request,'editprofile.html', {'student': student})
+
+    if request.method == 'POST':
+        address = request.POST.get('address')
+        website = request.POST.get('website')  # field name in template
+        github = request.POST.get('github')
+        linkedin = request.POST.get('linkedin')  # field name in template
+
+        student.address = address
+        student.website_url = website
+        student.github_url = github
+        student.linkedin_url = linkedin
+        student.save()
+
+        return redirect('account:profile')
+
+    return render(request, 'editprofile.html', {
+        'student': student,
+        'user': request.user,  # to access user.email
+        'profile': {
+            'avatar_url': None  # you can dynamically fetch an avatar later
+        }
+    })
