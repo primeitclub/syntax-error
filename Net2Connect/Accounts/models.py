@@ -71,9 +71,7 @@ class Student(models.Model):
             self.description,
             self.interest_fields,
             self.address,
-            self.website_url,
-            self.github_url,
-            self.linkedin_url,
+            
         ]
         return all(is_nonempty(field) for field in required_fields) and self.skills.exists()
 

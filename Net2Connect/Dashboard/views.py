@@ -179,7 +179,7 @@ def update_project(request, project_id):
         privacy = request.POST.get('privacy')
 
         try:
-            category = Category.objects.get(id=category_id)
+            category = Categories.objects.get(id=category_id)
             project.title = title
             project.category = category
             project.description = description
@@ -191,7 +191,7 @@ def update_project(request, project_id):
         except Exception as e:
             messages.error(request, f'Error updating project: {str(e)}')
 
-    categories = Category.objects.all()
+    categories = Categories.objects.all()
     return render(request, 'update_project.html', {
         'project': project,
         'categories': categories,

@@ -31,7 +31,7 @@ def verify_otp_view(request):
             otp_record.delete()
             request.session.pop('pending_user_id', None)
 
-            return redirect('dashboard:home')
+            return redirect('dashboard:dashboard')
         else:
             return render(request, 'registration/verify_otp.html', {'error': 'Invalid OTP'})
 
