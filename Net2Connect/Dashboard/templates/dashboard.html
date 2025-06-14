@@ -89,12 +89,12 @@
   <aside class="sidebar">
     <div class="companyname">Net2Connect</div>
     <ul>
-      <li><a href="{% url 'feed' %}">Feed</a></li>
-      <li><a href="{% url 'group' %}">Group</a></li>
-      <li><a href="{% url 'collab' %}">Collab</a></li>
-      <li><a href="{% url 'profile' %}">Profile</a></li>
-      <li><a href="{% url 'notification' %}">Notifications</a></li>
-      <li><a href="">Log Out</a></li>
+      <li><a href="{% url 'dashboard:feed' %}">Feed</a></li>
+      <li><a href="{% url 'dashboard:group' %}">Group</a></li>
+      <li><a href="{% url 'dashboard:collab' %}">Collab</a></li>
+      <li><a href="{% url 'account:profile' %}">Profile</a></li>
+      <li><a href="{% url 'dashboard:notification' %}">Notifications</a></li>
+      <li><a href="{% url 'account:logout'%}">Log Out</a></li>
     </ul>
   </aside>
 

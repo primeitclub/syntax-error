@@ -37,8 +37,6 @@ class Project(models.Model):
         return self.title
 
 # Student Model
-
-
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_name = models.CharField(max_length=150, unique=True)
@@ -62,8 +60,6 @@ class Student(models.Model):
 
 
 # EMail OTP
-
-
 class EmailOTP(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     otp = models.CharField(max_length=6)  # 6 digit OTP

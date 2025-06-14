@@ -24,9 +24,11 @@ def login_view(request):
             error = 'Email not found'
         else:
             user = authenticate(request, username=user.username, password=password)
+            # print(f"User active status: {user.is_active}")
             if user is not None:
+                
                 login(request, user)
-                return redirect('dashboard:home')
+                return redirect('/dashboard')
             else:
                 error = 'Invalid password'
 
@@ -109,7 +111,7 @@ def register_view(request):
 # Logout view to handle user logout
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('account:login')
 
 
 def profile(request):

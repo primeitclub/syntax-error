@@ -8,18 +8,31 @@ class Category(models.Model):
         return self.name
 
 class Project(models.Model):
-    PRIVACY_CHOICES = [
-        ('public', 'Public'),
-        ('private', 'Private'),
+    STATUS_CHOICES = [
+        ('ongoing', 'Ongoing'),
+        ('completed', 'Completed'),
     ]
-    
+
+    ACCESS_TYPE = [
+        ('open', 'Open to All'),
+        ('invite', 'By Invitation Only'),
+    ]
+
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='owned_projects')
     title = models.CharField(max_length=200)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-    description = models.TextField()
-    privacy = models.CharField(max_length=10, choices=PRIVACY_CHOICES, default='private')
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_projects')
-    members = models.ManyToManyField(User, related_name='joined_projects', blank=True)
-   
+    description = models.TextField(blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+
+    access_type = models.CharField(
+        max_length=10, choices=ACCESS_TYPE, default='invite')
+    max_members = models.PositiveIntegerField(default=1)
+
+    points = models.PositiveIntegerField(default=0)
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default='ongoing')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

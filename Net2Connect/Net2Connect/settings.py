@@ -146,3 +146,5 @@ EMAIL_FROM = "Employee Management System <hamrohr.webapp@gmail.com>"
 
 # Login Redirect URL
 LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/dashboard/'  # or 'dashboard:home'
+LOGOUT_REDIRECT_URL = '/login/'
