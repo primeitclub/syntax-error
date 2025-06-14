@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -105,6 +106,10 @@
       font-size: 0.8rem;
       color: #666;
     }
+    a {
+      text-decoration: none;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -112,15 +117,12 @@
   <aside class="sidebar">
     <div class="companyname">Net2Connect</div>
     <ul>
-      <li>Feed</li>
-      <li>Groups</li>
-      <li>Collabs</li>
-      <li>Inbox</li>
-      <li>Profile</li>
-      <li>Notifications</li>
-      <li>Search</li>
-      <li>Settings</li>
-      <li>Log Out</li>
+      <li><a href="{% url 'feed' %}">Feed</a></li>
+      <li><a href="{% url 'collab' %}">Collabs</a></li>
+      <li><a href="{% url 'inbox' %}">Inbox</a></li>
+      <li><a href="{% url 'notification' %}">Notifications</a></li>
+      <li><a href="{% url 'settings' %}">Settings</a></li>
+      <li><a href="{% url 'logout' %}">Log Out</a></li>
     </ul>
   </aside>
 
@@ -129,41 +131,8 @@
       <input type="text" placeholder="Search creators, platforms, content categories...">
       <button>🔍 ADVANCED SEARCH</button>
     </div>
-    <div class="creators-section">
-      <h3>Trending Creators</h3>
-      <div class="creators-grid">
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 1">
-          <h4>Carla Schleiffer</h4>
-          <p>800K Total Reach</p>
-        </div>
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 2">
-          <h4>Jakob Bergson</h4>
-          <p>800K Total Reach</p>
-        </div>
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 3">
-          <h4>Ruben Dakkis</h4>
-          <p>800K Total Reach</p>
-        </div>
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 4">
-          <h4>Justin Ekstrom</h4>
-          <p>800K Total Reach</p>
-        </div>
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 5">
-          <h4>Maren Horwitz</h4>
-          <p>800K Total Reach</p>
-        </div>
-        <div class="creator-card">
-          <img src="https://via.placeholder.com/60" alt="Creator 6">
-          <h4>Hanna Gouse</h4>
-          <p>800K Total Reach</p>
-        </div>
-      </div>
-    </div>
+    {% block content %}
+    {% endblock %}
   </main>
 
 </body>

@@ -21,6 +21,12 @@ from Dashboard import views
 
 urlpatterns = [
     path('dashboard/',views.dashboard, name='dashboard'),
+    path('feed/', views.feed, name='feed'),
+    path('collabs/', views.collab, name='collab'),
+    path('inbox/', views.inbox, name='inbox'),
+    path('settings/', views.settings, name='settings'),
+    path('notification/', views.notification, name='notification'),
+    path('logout/', views.logout_view, name='logout'),
 
     path('admin/', admin.site.urls),
 ]
