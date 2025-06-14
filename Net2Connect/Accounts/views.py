@@ -1,3 +1,4 @@
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Student, EmailOTP
 from django.shortcuts import render, redirect
@@ -9,10 +10,11 @@ import random
 from django.utils import timezone
 from datetime import timedelta
 from django.core.mail import send_mail
-from .models import EmailOTP
-
+from .models import EmailOTP, Skill
 
 # login_view
+
+
 def login_view(request):
     error = None
     if request.method == 'POST':
@@ -127,26 +129,62 @@ def profile(request):
 
 @login_required
 def editprofile(request):
-    student = Student.objects.filter(user=request.user).first()
+    # Try to get the Student instance; if none, raise 404 or handle accordingly
+    student = get_object_or_404(Student, user=request.user)
+    all_skills = Skill.objects.all()
 
     if request.method == 'POST':
         address = request.POST.get('address')
-        website = request.POST.get('website')  # field name in template
+        website = request.POST.get('website')  # match form field name
         github = request.POST.get('github')
-        linkedin = request.POST.get('linkedin')  # field name in template
+        linkedin = request.POST.get('linkedin')
+        description = request.POST.get('description')
+        interest_fields = request.POST.get('interest_fields')
+        skills_ids = request.POST.getlist(
+            'skills')  # list of skill IDs as strings
 
         student.address = address
         student.website_url = website
         student.github_url = github
         student.linkedin_url = linkedin
-        student.save()
+        student.description = description
+        student.interest_fields = interest_fields
 
+        skills_ids = request.POST.getlist('skills')  # existing skill IDs
+        new_skills_raw = request.POST.get('new_skills', '')  # comma separated string
+
+    # Fetch existing skills by ID
+        skills_objs = list(Skill.objects.filter(id__in=skills_ids))
+
+        # Process new skills if any
+        if new_skills_raw:
+            # Split by comma, strip spaces, ignore empty strings
+            new_skill_names = [name.strip() for name in new_skills_raw.split(',') if name.strip()]
+            
+            # For each new skill name, check if it exists, if not create
+            for skill_name in new_skill_names:
+                skill_obj, created = Skill.objects.get_or_create(name__iexact=skill_name, defaults={'name': skill_name})
+                skills_objs.append(skill_obj)
+
+        # Set all skills (existing + new) to student
+        student.skills.set(skills_objs)
+
+        # Save student
+        student.save()
         return redirect('account:profile')
 
-    return render(request, 'editprofile.html', {
+    # Assuming Student model has an avatar field or user profile does:
+    avatar_url = None
+    if hasattr(student, 'avatar') and student.avatar:
+        avatar_url = student.avatar.url
+    # Or customize according to your model
+
+    context = {
         'student': student,
-        'user': request.user,  # to access user.email
+        'user': request.user,
         'profile': {
-            'avatar_url': None  # you can dynamically fetch an avatar later
-        }
-    })
+            'avatar_url': avatar_url,
+        },
+        'all_skills': all_skills,
+    }
+    return render(request, 'editprofile.html', context)

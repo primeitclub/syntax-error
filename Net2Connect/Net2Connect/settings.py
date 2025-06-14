@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'Accounts.middleware.EnsureProfileCompleteMiddleware',
 ]
 
 ROOT_URLCONF = 'Net2Connect.urls'
