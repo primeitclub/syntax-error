@@ -4,9 +4,18 @@
 
 <style>
   .collab-main {
+    margin: 0;
     width: 100%;
     padding: 20px;  
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+
+  .collab-main::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
   }
 
   .section-title {
@@ -52,6 +61,7 @@
     justify-content: space-between;
     position: relative;
     flex: 0 0 auto;
+    margin-bottom: 0;
   }
 
   .project-card:hover {
