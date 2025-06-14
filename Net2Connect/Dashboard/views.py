@@ -129,19 +129,34 @@ def logout_view(request):
 
 # Removed @login_required for testing
 
-def collab(request):
-    print("Hello")
-    ongoing_projects = Project.objects.filter(status='ongoing') 
-    completed_projects = Project.objects.filter(status='completed')
+from django.db.models import Prefetch
+from django.db.models import Count
 
-    print("Ongoing Projects:", ongoing_projects)  # 🔍 This will print in terminal
-    print("Completed Projects:", completed_projects)
-    print("Ongoing:", ongoing_projects.count(), "Completed:", completed_projects.count())
+from django.db.models import Prefetch, Count
+
+def collab(request):
+    projects_qs = Project.objects.annotate(
+        _member_count=Count('members')
+    )
+    
+    ongoing_projects = projects_qs.filter(
+        status='ongoing'
+    ).prefetch_related(
+        Prefetch('members', queryset=User.objects.select_related('student'))
+    )
+    
+    completed_projects = projects_qs.filter(
+        status='completed'
+    ).prefetch_related(
+        Prefetch('members', queryset=User.objects.select_related('student'))
+    )
+
     return render(request, 'collab.html', {
         'ongoing_projects': ongoing_projects,
         'completed_projects': completed_projects
     })
- 
+
+
 def add_project(request):
     if request.method == 'POST':
         try:

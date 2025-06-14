@@ -51,7 +51,18 @@ class Student(models.Model):
     date_joined = models.DateTimeField(default=timezone.now)
     last_active = models.DateTimeField(null=True, blank=True)
     skills = models.ManyToManyField('Skill', blank=True)
-
+    image = models.ImageField(
+        upload_to='student_avatars/',
+        blank=True,
+        null=True,
+        default=None
+    )
+    
+    @property
+    def avatar_url(self):
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return '/static/avatar7.png'
     def __str__(self):
         return self.user.username
 

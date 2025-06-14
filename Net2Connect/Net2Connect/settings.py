@@ -150,3 +150,9 @@ EMAIL_FROM = "Net2Connect <hamrohr.webapp@gmail.com>"
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/dashboard/'  # or 'dashboard:home'
 LOGOUT_REDIRECT_URL = '/login/'
+
+
+# Media files (for user-uploaded content)
+# settings.py
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

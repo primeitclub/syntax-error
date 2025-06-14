@@ -62,3 +62,32 @@ class Project(models.Model):
             self.members.add(user)
             return True
         return False
+    
+    @property
+    def member_count(self):
+        """Optimized member count using annotation"""
+        if hasattr(self, '_member_count'):
+            return self._member_count
+        return self.members.count()
+
+
+    @property
+    def first_three_members(self):
+        """Get first 3 members with optimized query"""
+        return self.members.all().select_related('student')[:3]
+
+
+    @property
+    def progress_percentage(self):
+        """Calculate completion percentage if you have tasks"""
+        if hasattr(self, 'completed_tasks') and hasattr(self, 'total_tasks'):
+            if self.total_tasks > 0:
+                return int((self.completed_tasks / self.total_tasks) * 100)
+        return 0
+
+    def get_member_initials(self, member):
+        """Safe way to get member initials"""
+        return getattr(member, 'initials', member.username[:2].upper())
+
+    class Meta:
+        ordering = ['-created_at']
