@@ -13,7 +13,7 @@
 </head>
 <body>
   <div class="sidebar">
-    <div></div><div></div><div></div><div></div><div></div>
+    
   </div>
 
   <div class="main">
@@ -68,22 +68,22 @@
 
         <div class="cmts-and-team">
           <div class="comments">
-  <h5>Comments</h5>
-  <ul id="commentList" style="list-style: none; padding: 0; margin-bottom: 1rem;">
-    {% for comment in comments %}
-      <li style="margin-bottom: 0.5rem;">
-        <b>{{ comment.user }}</b>: {{ comment.text }}
-      </li>
-    {% empty %}
-      <li>No comments yet.</li>
-    {% endfor %}
-  </ul>
+            <h5>Comments</h5>
+            <ul id="commentList" style="list-style: none; padding: 0; margin-bottom: 1rem;">
+              {% for comment in comments %}
+                <li style="margin-bottom: 0.5rem;">
+                  <b>{{ comment.user }}</b>: {{ comment.text }}
+                </li>
+              {% empty %}
+                <li>No comments yet.</li>
+              {% endfor %}
+            </ul>
 
-  <div style="display: flex; gap: 0.5rem;">
-    <input id="commentInput" type="text" placeholder="Write a comment..." style="flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc;">
-    <button id="addCommentBtn" class="btn btn-primary btn-sm">Add</button>
-  </div>
-</div>
+            <div style="display: flex; gap: 0.5rem;">
+              <input id="commentInput" type="text" placeholder="Write a comment..." style="flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid #ccc;">
+              <button id="addCommentBtn" class="btn btn-primary btn-sm">Add</button>
+            </div>
+          </div>
 
           <div class="team-directory">
             <h5>Team Members</h5>
@@ -245,31 +245,31 @@
     updateProgress();
 
     const commentList = document.getElementById('commentList');
-const commentInput = document.getElementById('commentInput');
-const addCommentBtn = document.getElementById('addCommentBtn');
+    const commentInput = document.getElementById('commentInput');
+    const addCommentBtn = document.getElementById('addCommentBtn');
 
-// we get username from Django context:
-const currentUser = "{{ user.first_name }}";
+    // we get username from Django context:
+    const currentUser = "{{ user.first_name }}";
 
-addCommentBtn.addEventListener('click', () => {
-  const text = commentInput.value.trim();
-  if (text === '') return;
+    addCommentBtn.addEventListener('click', () => {
+      const text = commentInput.value.trim();
+      if (text === '') return;
 
-  // Remove "No comments yet."
-  const noComments = commentList.querySelector('li');
-  if (noComments && noComments.textContent.trim() === 'No comments yet.') {
-    noComments.remove();
-  }
+      // Remove "No comments yet."
+      const noComments = commentList.querySelector('li');
+      if (noComments && noComments.textContent.trim() === 'No comments yet.') {
+        noComments.remove();
+      }
 
-  const li = document.createElement('li');
-  li.style.marginBottom = '0.5rem';
-  li.innerHTML = `<b>${currentUser}</b>: ${text}`;
+      const li = document.createElement('li');
+      li.style.marginBottom = '0.5rem';
+      li.innerHTML = `<b>${currentUser}</b>: ${text}`;
 
-  commentList.appendChild(li);
+      commentList.appendChild(li);
 
-  commentInput.value = '';
-  commentInput.focus();
-});
+      commentInput.value = '';
+      commentInput.focus();
+    });
 
   </script>
 </body>
