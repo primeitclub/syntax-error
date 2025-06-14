@@ -1,6 +1,5 @@
 {% extends "dashboard.html" %}
 {% block title %}Collabs{% endblock %}
-
 {% block content %}
 
 <style>
@@ -182,6 +181,71 @@
     border: none;
   }
 
+  /* Add Fellows Button Styles */
+  .add-fellows-container {
+    margin-top: 10px;
+    display: none;
+  }
+
+  .add-fellows-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+  }
+
+  .add-fellows-btn:hover {
+    background-color: #0056b3;
+  }
+
+  .fellows-list {
+    margin-top: 10px;
+    max-height: 120px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #f8f9fa;
+  }
+
+  .fellow-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 8px;
+    margin: 2px 0;
+    background-color: white;
+    border-radius: 3px;
+    font-size: 0.85rem;
+  }
+
+  .remove-fellow {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 0.7rem;
+  }
+
+  .remove-fellow:hover {
+    background-color: #c82333;
+  }
+
+  .fellow-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+
   /* Scroll Buttons */
   .scroll-btn {
     position: absolute;
@@ -232,129 +296,48 @@
     <div class="project-grid-wrapper">
       <button class="scroll-btn left-btn">&#9664;</button>
       <div class="project-grid">
-        <a href="#" style="text-decoration: none">
+        {% for project in ongoing_projects %}
+        <a style="text-decoration: none">
           <div class="project-card">
             <div class="status-badge status-ongoing"></div>
-            <div class="project-title">🤖 AI Chatbot</div>
-            <div class="project-desc">
-              Building a chatbot using NLP techniques to answer student queries.
+            <div class="project-title">{{ project.title }}</div>
+            <div class="project-desc">{{ project.description }}</div>
+            <div class="deadline">Deadline: <span>{{ project.end_date }}</span></div>
+            <div class="progress-bar" title="{{ project.completed_tasks }}/{{ project.total_tasks }} tasks completed">
+              <div class="progress" style="width: {{ project.progress_percentage }}%"></div>
             </div>
-            <div class="deadline">Deadline: <span>2025-07-01</span></div>
-            <div class="progress-bar" title="5/10 tasks completed">
-              <div class="progress" style="width: 50%"></div>
-            </div>
-            <small>50% Complete</small>
+            <small>{{ project.progress_percentage }}50% Complete</small>
           </div>
         </a>
-        <a href="#" style="text-decoration: none">
-          <div class="project-card">
-            <div class="status-badge status-ongoing"></div>
-            <div class="project-title">🤖 AI Chatbot</div>
-            <div class="project-desc">
-              Building a chatbot using NLP techniques to answer student queries.
-            </div>
-            <div class="deadline">Deadline: <span>2025-07-01</span></div>
-            <div class="progress-bar" title="5/10 tasks completed">
-              <div class="progress" style="width: 50%"></div>
-            </div>
-            <small>50% Complete</small>
-          </div>
-        </a>
-        <a href="#" style="text-decoration: none">
-          <div class="project-card">
-            <div class="status-badge status-ongoing"></div>
-            <div class="project-title">🤖 AI Chatbot</div>
-            <div class="project-desc">
-              Building a chatbot using NLP techniques to answer student queries.
-            </div>
-            <div class="deadline">Deadline: <span>2025-07-01</span></div>
-            <div class="progress-bar" title="5/10 tasks completed">
-              <div class="progress" style="width: 50%"></div>
-            </div>
-            <small>50% Complete</small>
-          </div>
-        </a>
-        <a href="#" style="text-decoration: none">
-          <div class="project-card">
-            <div class="status-badge status-ongoing"></div>
-            <div class="project-title">🤖 AI Chatbot</div>
-            <div class="project-desc">
-              Building a chatbot using NLP techniques to answer student queries.
-            </div>
-            <div class="deadline">Deadline: <span>2025-07-01</span></div>
-            <div class="progress-bar" title="5/10 tasks completed">
-              <div class="progress" style="width: 50%"></div>
-            </div>
-            <small>50% Complete</small>
-          </div>
-        </a>
-        <a href="#" style="text-decoration: none">
-          <div class="project-card">
-            <div class="status-badge status-ongoing"></div>
-            <div class="project-title">🤖 AI Chatbot</div>
-            <div class="project-desc">
-              Building a chatbot using NLP techniques to answer student queries.
-            </div>
-            <div class="deadline">Deadline: <span>2025-07-01</span></div>
-            <div class="progress-bar" title="5/10 tasks completed">
-              <div class="progress" style="width: 50%"></div>
-            </div>
-            <small>50% Complete</small>
-          </div>
-        </a>
-        <a href="#" style="text-decoration: none">
-          <div class="project-card">
-            <div class="status-badge status-ongoing"></div>
-            <div class="project-title">🤖 AI Chatbot</div>
-            <div class="project-desc">
-              Building a chatbot using NLP techniques to answer student queries.
-            </div>
-            <div class="deadline">Deadline: <span>2025-07-01</span></div>
-            <div class="progress-bar" title="5/10 tasks completed">
-              <div class="progress" style="width: 50%"></div>
-            </div>
-            <small>50% Complete</small>
-          </div>
-        </a>
-        <a href="#" style="text-decoration: none">
-          <div class="project-card">
-            <div class="status-badge status-ongoing"></div>
-            <div class="project-title">🤖 AI Chatbot</div>
-            <div class="project-desc">
-              Building a chatbot using NLP techniques to answer student queries.
-            </div>
-            <div class="deadline">Deadline: <span>2025-07-01</span></div>
-            <div class="progress-bar" title="5/10 tasks completed">
-              <div class="progress" style="width: 50%"></div>
-            </div>
-            <small>50% Complete</small>
-          </div>
-        </a>
-        <!-- Duplicate as many project-cards as you need -->
+        {% empty %}
+        <p>No ongoing projects found.</p>
+        {% endfor %}
       </div>
       <button class="scroll-btn right-btn">&#9654;</button>
     </div>
   </div>
-
+  
   <p class="section-title">Completed Projects</p>
   <div class="completed-section">
     <div class="project-grid-wrapper">
       <button class="scroll-btn left-btn">&#9664;</button>
       <div class="project-grid">
-        <a href="#" style="text-decoration: none">
+        {% for project in completed_projects %}
+        <a  style="text-decoration: none">
           <div class="project-card">
             <div class="status-badge status-completed"></div>
-            <div class="project-title">📱 Health Tracker App</div>
-            <div class="project-desc">
-              An app that logs and analyzes daily health metrics with reminders.
-            </div>
-            <div class="deadline">Completed on: <span>2025-06-15</span></div>
+            <div class="project-title">{{ project.title }}</div>
+            <div class="project-desc">{{ project.description }}</div>
+            <div class="deadline">Completed on: <span>{{ project.completed_date }}</span></div>
             <div class="progress-bar" title="All tasks completed">
               <div class="progress" style="width: 100%"></div>
             </div>
             <small>100% Complete</small>
           </div>
         </a>
+        {% empty %}
+        <p>No completed projects found.</p>
+        {% endfor %}
       </div>
       <button class="scroll-btn right-btn">&#9654;</button>
     </div>
@@ -362,30 +345,184 @@
 
   <div class="create-form">
     <h3>Create New Project</h3>
-    <form>
-      <div><label>Project Title</label><br><input type="text" style="width:100%;padding:8px;margin-bottom:10px"></div>
-      <div><label>Description</label><br><textarea style="width:100%;padding:8px;height:80px;margin-bottom:10px"></textarea></div>
-      <div><label>Start Date</label><br><input type="date" style="width:100%;padding:8px;margin-bottom:10px"></div>
-      <div><label>End Date</label><br><input type="date" style="width:100%;padding:8px;margin-bottom:10px"></div>
-      <div><label>Access</label><br><select style="width:100%;padding:8px;margin-bottom:10px">
-        <option value="public">Public</option>
-        <option value="private">Private</option>
-      </select></div>
-      <button type="submit" class="create-button" style="width:100%;margin-top:10px">Create</button>
-    </form>
+    <form method="POST" action="{% url 'dashboard:add_project' %}" id="project-form">
+
+      {% csrf_token %}
+      
+      <!-- Project Title -->
+      <div>
+          <label>Project Title*</label><br>
+          <input type="text" name="title" required style="width:100%;padding:8px;margin-bottom:10px">
+      </div>
+      
+      <!-- Description -->
+      <div>
+          <label>Description</label><br>
+          <textarea name="description" style="width:100%;padding:8px;height:80px;margin-bottom:10px"></textarea>
+      </div>
+      
+      <!-- Dates -->
+      <div>
+          <label>Start Date</label><br>
+          <input type="date" name="start_date" style="width:100%;padding:8px;margin-bottom:10px">
+      </div>
+      <div>
+          <label>End Date</label><br>
+          <input type="date" name="end_date" style="width:100%;padding:8px;margin-bottom:10px">
+      </div>
+      
+      <!-- Access Type -->
+      <div>
+          <label>Access Type*</label><br>
+          <select name="access_type" id="access-select" required style="width:100%;padding:8px;margin-bottom:10px">
+              <option value="open">Public (Open to All)</option>
+              <option value="invite" selected>Private (By Invitation Only)</option>
+          </select>
+      </div>
+      
+      <!-- Max Members -->
+      <div>
+          <label>Maximum Members</label><br>
+          <input type="number" name="max_members" min="1" value="1" style="width:100%;padding:8px;margin-bottom:10px">
+      </div>
+      <!-- Category -->
+      <div>
+        <label>Project Categories* (Hold Ctrl/Cmd to select multiple)</label><br>
+        <select name="categories" multiple required 
+                style="width:100%;padding:8px;margin-bottom:10px;height:120px;">
+            <option value="web">Web Development</option>
+            <option value="app">Mobile App Development</option>
+            <option value="ml">Machine Learning / AI</option>
+            <option value="ds">Data Science</option>
+            <option value="uiux">UI/UX Design</option>
+            <option value="cyber">Cybersecurity</option>
+            <option value="iot">IoT & Embedded Systems</option>
+            <option value="game">Game Development</option>
+            <option value="blockchain">Blockchain</option>
+            <option value="other">Other</option>
+        </select>
+        <small class="help-text">Hold Ctrl (Windows) or Command (Mac) to select multiple options</small>
+      </div>
+      <!-- Fellows Section (for private projects) -->
+      <div class="add-fellows-container" id="fellows-container">
+          <button type="button" class="add-fellows-btn" id="add-fellows-btn">+ Add Fellows</button>
+          <input type="email" class="fellow-input" id="fellow-email" name="fellows" placeholder="Enter fellow's email" style="display:none; margin-top:10px;">
+          <button type="button" id="add-fellow-confirm" style="display:none; background:#28a745; color:white; border:none; padding:5px 10px; border-radius:3px; margin-left:5px;">Add</button>
+          <div class="fellows-list" id="fellows-list" style="display:none;"></div>
+      </div>
+      
+      <button type="submit" class="create-button" style="width:100%;margin-top:10px">Create Project</button>
+  </form>
   </div>
 </div>
 
 <script>
   const createBtn = document.getElementById("create-project-btn");
   const createForm = document.querySelector(".create-form");
+  const accessSelect = document.getElementById("access-select");
+  const fellowsContainer = document.getElementById("fellows-container");
+  const addFellowsBtn = document.getElementById("add-fellows-btn");
+  const fellowEmailInput = document.getElementById("fellow-email");
+  const addFellowConfirm = document.getElementById("add-fellow-confirm");
+  const fellowsList = document.getElementById("fellows-list");
+  
+  let fellows = [];
 
+  // Show/hide create form
   createBtn.addEventListener("click", () => createForm.style.display = "block");
-  createForm.querySelector("form").addEventListener("submit", e => {
+  
+  // Handle access selection change
+  accessSelect.addEventListener("change", function() {
+    if (this.value === "private") {
+      fellowsContainer.style.display = "block";
+    } else {
+      fellowsContainer.style.display = "none";
+      // Reset fellows when switching to public
+      fellows = [];
+      updateFellowsList();
+      hideAddFellowInput();
+    }
+  });
+
+  // Show email input when Add Fellows is clicked
+  addFellowsBtn.addEventListener("click", function() {
+    fellowEmailInput.style.display = "inline-block";
+    addFellowConfirm.style.display = "inline-block";
+    fellowEmailInput.focus();
+  });
+
+  // Add fellow functionality
+  addFellowConfirm.addEventListener("click", function() {
+    const email = fellowEmailInput.value.trim();
+    if (email && isValidEmail(email)) {
+      if (!fellows.includes(email)) {
+        fellows.push(email);
+        updateFellowsList();
+        fellowEmailInput.value = "";
+        hideAddFellowInput();
+      } else {
+        alert("This fellow is already added!");
+      }
+    } else {
+      alert("Please enter a valid email address!");
+    }
+  });
+
+  // Add fellow on Enter key
+  fellowEmailInput.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+      addFellowConfirm.click();
+    }
+  });
+
+  function hideAddFellowInput() {
+    fellowEmailInput.style.display = "none";
+    addFellowConfirm.style.display = "none";
+  }
+
+  function updateFellowsList() {
+    if (fellows.length > 0) {
+      fellowsList.style.display = "block";
+      fellowsList.innerHTML = fellows.map((email, index) => `
+        <div class="fellow-item">
+          <span>${email}</span>
+          <button type="button" class="remove-fellow" onclick="removeFellow(${index})">×</button>
+        </div>
+      `).join("");
+    } else {
+      fellowsList.style.display = "none";
+    }
+  }
+
+  function removeFellow(index) {
+    fellows.splice(index, 1);
+    updateFellowsList();
+  }
+
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // Form submission
+  {% comment %} createForm.querySelector("form").addEventListener("submit", e => {
     e.preventDefault();
+    const formData = new FormData(e.target);
+    if (accessSelect.value === "private" && fellows.length > 0) {
+      console.log("Fellows to add:", fellows);
+    }
     alert("Project created successfully!");
     createForm.style.display = "none";
-  });
+    // Reset form
+    fellows = [];
+    updateFellowsList();
+    hideAddFellowInput();
+    accessSelect.value = "public";
+    fellowsContainer.style.display = "none";
+  }); 
+  // {% endcomment %}
+
+  // Close form when clicking outside
   document.addEventListener("click", e => {
     if (createForm.style.display === "block" && !createForm.contains(e.target) && e.target !== createBtn) {
       createForm.style.display = "none";

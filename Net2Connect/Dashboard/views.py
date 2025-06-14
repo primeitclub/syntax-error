@@ -104,10 +104,10 @@ def feed(request):
     })
 
 
-def collab(request):
-    student = Student.objects.filter(user=request.user).first()
+# def collab(request):
+#     student = Student.objects.filter(user=request.user).first()
 
-    return render(request, 'collab.html',{'student': student})
+#     return render(request, 'collab.html',{'student': student})
 
 
 
@@ -129,56 +129,69 @@ def logout_view(request):
 
 # Removed @login_required for testing
 
+def collab(request):
+    print("Hello")
+    ongoing_projects = Project.objects.filter(status='ongoing') 
+    completed_projects = Project.objects.filter(status='completed')
 
-@login_required
+    print("Ongoing Projects:", ongoing_projects)  # 🔍 This will print in terminal
+    print("Completed Projects:", completed_projects)
+    print("Ongoing:", ongoing_projects.count(), "Completed:", completed_projects.count())
+    return render(request, 'collab.html', {
+        'ongoing_projects': ongoing_projects,
+        'completed_projects': completed_projects
+    })
+ 
 def add_project(request):
     if request.method == 'POST':
-        title = request.POST.get('title')
-        category_id = request.POST.get('category')
-        description = request.POST.get('description')
-        privacy = request.POST.get('privacy')
-
         try:
-            # For testing, use the first user in the database
-            test_user = User.objects.first()
-            if not test_user:
-                messages.error(request, 'No test user found in database')
-                return redirect('add_project')
-
-            category = Category.objects.get(id=category_id)
+            # Get form data
+            title = request.POST['title']
+            description = request.POST.get('description', '')
+            start_date = request.POST.get('start_date')
+            end_date = request.POST.get('end_date')
+            access_type = request.POST['access_type']
+            max_members = request.POST.get('max_members', 1)
+            category_ids = request.POST.getlist('categories')  # Get list of category IDs
+            
+            # Create project (without categories first)
             project = Project.objects.create(
+                owner=request.user,
                 title=title,
-                category=category,
                 description=description,
-                privacy=privacy,
-                created_by=test_user
+                start_date=start_date or None,
+                end_date=end_date or None,
+                access_type=access_type,
+                max_members=max_members
             )
-            project.members.add(test_user)
+            
+            # Add categories (many-to-many relationship)
+            for category_id in category_ids:
+                category = Categories.objects.get(id=category_id)
+                project.categories.add(category)
+            
+            project.members.add(request.user)
             messages.success(request, 'Project created successfully!')
-            return redirect('project_detail', project_id=project.id)
+            return redirect('dashboard:collab')
+            
         except Exception as e:
             messages.error(request, f'Error creating project: {str(e)}')
-            return redirect('add_project')
-
-    categories = Category.objects.all()
-    return render(request, 'add_project.html', {
-        'categories': categories,
-        'privacy_choices': Project.PRIVACY_CHOICES
-    })
+            return redirect('dashboard:collab')
+    
+    categories = Categories.objects.all()
+    return render(request, 'collab.html', {'categories': categories})
 
 # Removed @login_required for testing
-
-
 @login_required
 def update_project(request, project_id):
     project = get_object_or_404(Project, id=project_id)
-
+    
     if request.method == 'POST':
         title = request.POST.get('title')
         category_id = request.POST.get('category')
         description = request.POST.get('description')
         privacy = request.POST.get('privacy')
-
+        
         try:
             category = Categories.objects.get(id=category_id)
             project.title = title
@@ -186,12 +199,43 @@ def update_project(request, project_id):
             project.description = description
             project.privacy = privacy
             project.save()
-
+            
             messages.success(request, 'Project updated successfully!')
             return redirect('project_detail', project_id=project.id)
         except Exception as e:
             messages.error(request, f'Error updating project: {str(e)}')
+    
+    categories = Categories.objects.all()
+    return render(request, 'update_project.html', {
+        'project': project,
+        'categories': categories,
+        'privacy_choices': Project.PRIVACY_CHOICES
+    })
 
+
+@login_required
+def update_project(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        category_id = request.POST.get('category')
+        description = request.POST.get('description')
+        privacy = request.POST.get('privacy')
+        
+        try:
+            category = Categories.objects.get(id=category_id)
+            project.title = title
+            project.category = category
+            project.description = description
+            project.privacy = privacy
+            project.save()
+            
+            messages.success(request, 'Project updated successfully!')
+            return redirect('project_detail', project_id=project.id)
+        except Exception as e:
+            messages.error(request, f'Error updating project: {str(e)}')
+    
     categories = Categories.objects.all()
     return render(request, 'update_project.html', {
         'project': project,
