@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'Accounts.middleware.EnsureProfileCompleteMiddleware',
 ]
 
 ROOT_URLCONF = 'Net2Connect.urls'
@@ -141,7 +142,7 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = "hamrohr.webapp@gmail.com"
 EMAIL_HOST_PASSWORD = "psop hhcv njfx pigr"
-EMAIL_FROM = "Employee Management System <hamrohr.webapp@gmail.com>"
+EMAIL_FROM = "Net2Connect <hamrohr.webapp@gmail.com>"
 
 
 # Login Redirect URL

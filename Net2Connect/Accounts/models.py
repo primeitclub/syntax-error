@@ -24,9 +24,6 @@ class Skill(models.Model):
     def __str__(self):
         return self.name
 
-# Project Model
-
-
 
 
 # Student Model
@@ -34,7 +31,7 @@ class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_name = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
-    points = models.IntegerField(default=0)
+    points = models.IntegerField(default=10)
     
     address = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -59,7 +56,22 @@ class Student(models.Model):
     def full_name(self):
         return f"{self.user.first_name} {self.user.last_name}"
 
+    def is_profile_complete(self):
+        def is_nonempty(field):
+            return bool(field and field.strip())
 
+        required_fields = [
+            self.description,
+            self.interest_fields,
+            self.address,
+            self.website_url,
+            self.github_url,
+            self.linkedin_url,
+        ]
+
+        return all(is_nonempty(field) for field in required_fields) and self.skills.exists()
+
+    
 # EMail OTP
 class EmailOTP(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
