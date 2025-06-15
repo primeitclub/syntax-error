@@ -148,7 +148,6 @@
 </style>
 
 <div class="container py-4">
-
   <h3 class="mb-4">🚀 Suggested Projects for You</h3>
   {% if suggested_projects %}
     <div class="row g-4">
@@ -168,7 +167,8 @@
                 <em>No skills specified</em>
               {% endif %}
             </p>
-            <a href="#" 
+            <!-- UPDATED join-btn URL to AJAX endpoint -->
+            <a href="{% url 'dashboard:join_project_ajax' project.id %}" 
                class="join-btn" 
                data-project-id="{{ project.id }}">
                🔗 Join
@@ -231,6 +231,7 @@ function getCookie(name) {
 }
 const csrftoken = getCookie('csrftoken');
 
+// Connect Button AJAX
 document.querySelectorAll('.connect-btn').forEach(button => {
   button.addEventListener('click', function(e) {
     e.preventDefault();
@@ -251,31 +252,40 @@ document.querySelectorAll('.connect-btn').forEach(button => {
       } else {
         alert(data.error || "Error sending request");
       }
-    });
+    })
+    .catch(() => alert("Network error, please try again."));
   });
 });
 
+// Join Project AJAX
 document.querySelectorAll('.join-btn').forEach(button => {
   button.addEventListener('click', function(e) {
     e.preventDefault();
     const projectId = this.dataset.projectId;
-    fetch(`/dashboard/join_request/${projectId}/`, {
+    fetch(`/dashboard/projects/${projectId}/join/ajax/`, {
       method: 'POST',
       headers: {
         'X-CSRFToken': csrftoken,
         'Content-Type': 'application/json'
       },
     })
-    .then(res => res.json())
+    .then(res => {
+      // If response is not JSON, try to handle it gracefully
+      return res.json().catch(() => ({ error: "Unexpected server response" }));
+    })
     .then(data => {
       if (data.success) {
         alert(data.success);
         this.disabled = true;
         this.textContent = "Requested";
+        setTimeout(() => {
+          window.location.href = '/dashboard/collab/';
+        }, 1000);
       } else {
         alert(data.error || "Error sending join request");
       }
-    });
+    })
+    .catch(() => alert("Network error, please try again."));
   });
 });
 </script>

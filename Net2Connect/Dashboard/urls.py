@@ -6,7 +6,6 @@ urlpatterns = [
     path('',views.feed,name="feed"),
     
     path('collab/',views.collab,name="collab"),
-    path('inbox/',views.dashboard,name="inbox"),
     path('notifications/', views.notification, name='notification'),
     path('notifications/dismiss/', views.dismiss_notifications, name='dismiss_notifications'),
     path('notifications/detail/<int:notification_id>/', views.notification_detail, name='notification_detail'),
@@ -17,6 +16,8 @@ urlpatterns = [
     path('projects/<int:project_id>/delete/', views.delete_project, name='delete_project'),
     path('projects/<int:project_id>/leave/', views.leave_project, name='leave_project'),
     path('projects/<int:project_id>/join/', views.join_project_view, name='join_project'),
+    path('projects/<int:project_id>/join/ajax/', views.join_project_ajax, name='join_project_ajax'),
+
 
 
 

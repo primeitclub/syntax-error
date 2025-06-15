@@ -1,3 +1,13 @@
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+# adjust import if your Student model is elsewhere
+from Accounts.models import Student
+from Dashboard.models import Project, Categories, Skill, Notification
+from .models import Notification
+from connections.models import ConnectionRequest
+from .models import Student, Project
+from django.db.models import Q, Count, F
 from django.shortcuts import get_object_or_404, redirect
 from .models import Project, Categories, Skill
 from django.conf import settings
@@ -44,77 +54,73 @@ def feed(request):
 
     search_query = request.GET.get('q', '').strip().lower()
 
-    # Prepare student skills and interest fields
-    student_skills = set(student.skills.all())
-    student_fields = set(f.strip().lower()
-                         for f in (student.interest_fields or "").split(","))
+    # Get connected student IDs
+    connected_ids = set(student.connections.values_list('id', flat=True))
+
+    # Get pending connection requests sent by current user (User object, not Student)
+    pending_sent_requests_user_ids = set(
+        ConnectionRequest.objects.filter(from_user=request.user, accepted=None)
+        .values_list('to_user_id', flat=True)
+    )
+
+    # Map pending user IDs to student IDs
+    pending_sent_student_ids = set(
+        Student.objects.filter(
+            user__id__in=pending_sent_requests_user_ids).values_list('id', flat=True)
+    )
+
+    # Projects already joined by student
+    joined_project_ids = set(
+        request.user.joined_projects.values_list('id', flat=True))
 
     if search_query:
-        # Filter projects by query (completed + skill/field matching)
+        # Search-based filtering for projects
         projects = Project.objects.filter(
             Q(title__icontains=search_query) |
             Q(description__icontains=search_query) |
             Q(required_fields__icontains=search_query) |
             Q(required_skills__name__icontains=search_query)
+        ).exclude(
+            id__in=joined_project_ids
         ).distinct()
 
-        creators = Student.objects.exclude(id=student.id).filter(
+        # Search-based filtering for creators
+        creators = Student.objects.exclude(id=student.id).exclude(
+            id__in=connected_ids.union(pending_sent_student_ids)
+        ).filter(
             Q(user__username__icontains=search_query) |
             Q(user_name__icontains=search_query) |
             Q(interest_fields__icontains=search_query) |
             Q(skills__name__icontains=search_query)
         ).distinct()
 
-        suggested_projects = projects[:6]
+        suggested_projects = projects
         suggested_creators = creators[:6]
 
     else:
-        # ✅ Recommend only OPEN, ONGOING projects that are not full
-        ongoing_projects = Project.objects.filter(
-            status='ongoing',
-            access_type='open'
-        ).annotate(
-            _member_count=Count('members')
-        ).filter(
-            _member_count__lt=F('max_members')
-        ).prefetch_related('required_skills')
+        # Show all projects except those already joined
+        all_projects = Project.objects.exclude(
+            id__in=joined_project_ids).prefetch_related('required_skills')
+        suggested_projects = all_projects
 
-        project_suggestions = []
-        for project in ongoing_projects:
-            project_skills = set(project.required_skills.all())
-            project_fields = set(f.strip().lower() for f in (
-                project.required_fields or "").split(","))
+        # Suggest creators based on matching skills and fields, not connected or requested
+        student_skills = set(student.skills.all())
+        student_fields = set(f.strip().lower()
+                             for f in (student.interest_fields or "").split(","))
 
-            score = (
-                len(student_skills & project_skills) * 2 +
-                len(student_fields & project_fields)
-            )
-            print(f"[DEBUG] Project: {project.title}")
-            print(
-                f"  Project skills: {[skill.name for skill in project_skills]}")
-            print(f"  Project fields: {project_fields}")
-            print(
-                f"  Student skills: {[skill.name for skill in student_skills]}")
-            print(f"  Student fields: {student_fields}")
-            print(f"  Score: {score}")
-            if score > 0:
-                project_suggestions.append((project, score))
-
-        project_suggestions.sort(key=lambda x: x[1], reverse=True)
-        suggested_projects = [proj for proj, _ in project_suggestions[:6]]
-
-        # ✅ Recommend other creators (students) based on match
         all_students = Student.objects.exclude(
-            id=student.id).prefetch_related('skills')
-        creator_suggestions = []
+            id=student.id
+        ).exclude(
+            id__in=connected_ids.union(pending_sent_student_ids)
+        ).prefetch_related('skills')
 
+        creator_suggestions = []
         for s in all_students:
             match_skills = len(student_skills & set(s.skills.all()))
             s_fields = set(f.strip().lower()
                            for f in (s.interest_fields or "").split(","))
             match_fields = len(student_fields & s_fields)
             score = match_skills * 2 + match_fields
-
             if score > 0:
                 creator_suggestions.append((s, score))
 
@@ -129,25 +135,14 @@ def feed(request):
     })
 
 
-def inbox(request):
-    return render(request, 'inbox.html')
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from .models import Notification
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from Accounts.models import Student
-from .models import Notification
-
 @login_required
 def notification(request):
     student = Student.objects.filter(user=request.user).first()
     if not student:
         return render(request, 'notification.html', {'notifications': [], 'error': "Student profile not found."})
 
-    notifications = Notification.objects.filter(student=student).select_related('project', 'project__owner').order_by('-created_at')
+    notifications = Notification.objects.filter(student=student).select_related(
+        'project', 'project__owner').order_by('-created_at')
     return render(request, 'notification.html', {'notifications': notifications})
 
 
@@ -155,17 +150,22 @@ def notification(request):
 def dismiss_notifications(request):
     student = Student.objects.filter(user=request.user).first()
     if request.method == 'POST' and student:
-        Notification.objects.filter(student=student, is_read=False).update(is_read=True)
+        Notification.objects.filter(
+            student=student, is_read=False).update(is_read=True)
     return redirect('dashboard:notification')
 
 # Notification Detail view
+
+
 @login_required
 def notification_detail(request, notification_id):
-    notification = get_object_or_404(Notification, id=notification_id, student__user=request.user)
+    notification = get_object_or_404(
+        Notification, id=notification_id, student__user=request.user)
     notification.is_read = True
     notification.save()
-    
+
     return render(request, 'notification_detail.html', {'notification': notification})
+
 
 def settings(request):
     return render(request, 'settings.html')
@@ -203,17 +203,6 @@ def collab(request):
         'invited_projects': invited_projects,
         'skills': skills,
     })
-
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.core.mail import send_mail
-from django.conf import settings
-from django.contrib.auth import get_user_model
-
-from Dashboard.models import Project, Categories, Skill, Notification
-from Accounts.models import Student  # adjust import if your Student model is elsewhere
 
 
 @login_required
@@ -260,12 +249,13 @@ def add_project(request):
             # Handle invitations
             invited_count = 0
             UserModel = get_user_model()
-            invitees = [x.strip() for x in invitees_input.split(',') if x.strip()]
+            invitees = [x.strip()
+                        for x in invitees_input.split(',') if x.strip()]
 
             for identifier in invitees:
                 # Lookup user by username or email
                 user = UserModel.objects.filter(username=identifier).first() or \
-                       UserModel.objects.filter(email=identifier).first()
+                    UserModel.objects.filter(email=identifier).first()
 
                 if user and user != request.user:
                     # Use your invite_user method to add invited user (implement it in Project model)
@@ -324,20 +314,21 @@ def update_project(request, project_id):
 
     if request.method == 'POST':
         title = request.POST.get('title')
-        category_id = request.POST.get('category')
         description = request.POST.get('description')
-        privacy = request.POST.get('privacy')
+        access_type = request.POST.get('privacy')
+        category_ids = request.POST.getlist('categories')
 
         try:
-            category = Categories.objects.get(id=category_id)
+            categories = Categories.objects.filter(id__in=category_ids)
+
             project.title = title
-            project.category = category
             project.description = description
-            project.privacy = privacy
+            project.access_type = access_type
             project.save()
+            project.categories.set(categories)
 
             messages.success(request, 'Project updated successfully!')
-            return redirect('project_detail', project_id=project.id)
+            return redirect('dashboard:project_detail', project_id=project.id)
         except Exception as e:
             messages.error(request, f'Error updating project: {str(e)}')
 
@@ -345,8 +336,9 @@ def update_project(request, project_id):
     return render(request, 'update_project.html', {
         'project': project,
         'categories': categories,
-        'privacy_choices': Project.PRIVACY_CHOICES
+        'privacy_choices': Project.ACCESS_TYPE
     })
+
 
 # Delete project view
 
@@ -375,19 +367,52 @@ def delete_project(request, project_id):
 def join_project_view(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
-    if project.join_project(request.user):
-        messages.success(request, "🎉 You've successfully joined the project!")
-    else:
-        if project.access_type == 'invite' and request.user not in project.invited_users.all():
-            messages.warning(
-                request, "❌ You need an invitation to join this project.")
-        elif project.members.count() >= project.max_members:
-            messages.error(request, "⚠️ This project is already full.")
+    if request.method == 'POST':
+        # Try to join project using your existing method
+        if project.join_project(request.user):
+            messages.success(
+                request, "🎉 You've successfully joined the project!")
+            return redirect('dashboard:project_detail', project_id=project.id)
         else:
-            messages.error(
-                request, "🚫 You're not allowed to join this project.")
+            # Handle failure reasons for join
+            if project.access_type == 'invite' and request.user not in project.invited_users.all():
+                messages.warning(
+                    request, "❌ You need an invitation to join this project.")
+            elif project.members.count() >= project.max_members:
+                messages.error(request, "⚠️ This project is already full.")
+            else:
+                messages.error(
+                    request, "🚫 You're not allowed to join this project.")
+            return redirect('dashboard:project_detail', project_id=project.id)
 
-    return redirect('dashboard:project_detail', project_id=project.id)
+    # GET request → Show confirmation page
+    return render(request, 'join_project.html', {
+        'project': project,
+    })
+
+
+@login_required
+@require_POST
+def join_project_ajax(request, project_id):
+    project = get_object_or_404(Project, id=project_id)
+
+    # Check if user already joined
+    if project.members.filter(id=request.user.id).exists():
+        return JsonResponse({'error': 'You are already a member.'}, status=400)
+
+    # Check invitation if required
+    if project.access_type == 'invite' and request.user not in project.invited_users.all():
+        return JsonResponse({'error': 'You need an invitation to join this project.'}, status=403)
+
+    # Check max members
+    if project.members.count() >= project.max_members:
+        return JsonResponse({'error': 'Project is full.'}, status=400)
+
+    if project.join_project(request.user):
+        return JsonResponse({'success': "🎉 You've successfully joined the project!"})
+    else:
+        return JsonResponse({'error': 'Failed to join project.'}, status=400)
+
 
 # leave Project view
 
@@ -404,6 +429,7 @@ def leave_project(request, project_id):
         messages.success(request, 'You have left the project successfully!')
         return redirect('dashboard:collab')
 
+    # GET request => show confirmation page
     return render(request, 'leave_project.html', {
         'project': project
     })

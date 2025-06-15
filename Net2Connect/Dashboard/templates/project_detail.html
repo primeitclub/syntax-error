@@ -65,10 +65,9 @@
     <a href="{% url 'dashboard:delete_project' project.id %}" class="btn btn-danger">Delete Project</a>
   {% else %}
     {% if user in project.members.all %}
-      <form method="post" action="{% url 'dashboard:leave_project' project.id %}" class="d-inline">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-warning">Leave Project</button>
-      </form>
+  <a href="{% url 'dashboard:leave_project' project.id %}" class="btn btn-warning">Leave Project</a>
+{% elif ... %}
+
     {% elif project.access_type == 'open' and project.members.count < project.max_members %}
       <form method="post" action="{% url 'dashboard:join_project' project.id %}" class="d-inline">
         {% csrf_token %}
