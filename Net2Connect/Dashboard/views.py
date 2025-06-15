@@ -1,3 +1,6 @@
+import json
+from .forms import TaskForm
+from .models import Project
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -34,6 +37,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Categories
 from Accounts.models import Student
+from .models import Task
 
 
 def dashboard(request):
@@ -438,9 +442,67 @@ def leave_project(request, project_id):
 @login_required
 def project_detail(request, project_id):
     project = get_object_or_404(Project, id=project_id)
+    members_without_owner = project.members.exclude(id=project.owner.id)
+
+    assignable_user_ids = list(project.members.values_list(
+        'id', flat=True)) + list(project.invited_users.values_list('id', flat=True))
+    assignable_users = User.objects.filter(
+        id__in=assignable_user_ids).distinct()
+
+    tasks = project.tasks.select_related('assigned_to')
+
+    task_form = TaskForm(assignable_users=assignable_users)
+
+    if request.method == 'POST':
+        if 'add_task' in request.POST:
+            task_form = TaskForm(
+                request.POST, assignable_users=assignable_users)
+            if task_form.is_valid():
+                task = task_form.save(commit=False)
+                task.project = project
+                task.save()
+                return redirect('dashboard:project_detail', project_id=project.id)
+
     return render(request, 'project_detail.html', {
-        'project': project
+        'project': project,
+        'tasks': tasks,
+        'task_form': task_form,
+        'members': project.members.all(),
+        'members_without_owner': members_without_owner,
     })
+
+
+@login_required
+def toggle_task_complete(request):
+    try:
+        data = json.loads(request.body)
+        task_id = data.get('task_id')
+        is_completed = data.get('is_completed')
+
+        task = get_object_or_404(Task, id=task_id)
+
+        # Authorization check
+        if task.assigned_to != request.user:
+            return JsonResponse({'success': False, 'error': 'Not authorized'}, status=403)
+
+        task.is_completed = is_completed
+        task.save()
+
+        # Calculate progress for the project
+        project = task.project
+        total = project.tasks.count()
+        completed = project.tasks.filter(is_completed=True).count()
+        progress = int((completed / total) * 100) if total > 0 else 0
+
+        return JsonResponse({
+            'success': True,
+            'is_completed': task.is_completed,
+            'progress': progress,
+            'completed_tasks': completed,
+            'total_tasks': total,
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 # Removed @login_required for testing
 

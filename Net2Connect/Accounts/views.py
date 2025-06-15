@@ -1,3 +1,5 @@
+from Accounts.models import Student
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -119,18 +121,23 @@ def logout_view(request):
     return redirect('account:login')
 
 
-def profile(request):
-    student = Student.objects.filter(user=request.user).first()
-    student.last_active = timezone.now()
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.utils import timezone
 
+def my_profile(request):
+    if not request.user.is_authenticated:
+        return redirect('account:login')
+    student = get_object_or_404(Student, user=request.user)
+    student.last_active = timezone.now()
     if student.points < 0:
         student.points = 0
-
     student.save()
+    return render(request, 'profile.html', {'student': student})
 
-    return render(request, 'profile.html', {
-        'student': student,
-    })
+def profile(request, username):
+    student = get_object_or_404(Student, user__username=username)
+    return render(request, 'profile.html', {'student': student})
 
 
 @login_required

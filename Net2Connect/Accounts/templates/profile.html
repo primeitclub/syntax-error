@@ -95,7 +95,10 @@
         <div class="col-lg-4 mb-4">
             <div class="profile-card text-center">
                 <div class="profile-header">
-                    <a href="{%url 'account:profile'%}"><img src="{{ student.avatar_url|default:'https://bootdey.com/img/Content/avatar/avatar7.png' }}" alt="Avatar"></a>
+                    <a href="{% url 'account:profile' student.username %}">
+    <img src="{{ student.avatar_url|default:'https://bootdey.com/img/Content/avatar/avatar7.png' }}" alt="Avatar">
+</a>
+
                     <h4>{{ student.full_name }}</h4>
                     <p class="text-muted mb-1">Student</p>
                     <span class="badge bg-success">{{ student.points }} Points</span>
