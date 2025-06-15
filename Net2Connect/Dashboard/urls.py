@@ -17,7 +17,7 @@ urlpatterns = [
     path('projects/<int:project_id>/leave/', views.leave_project, name='leave_project'),
     path('projects/<int:project_id>/join/', views.join_project_view, name='join_project'),
     path('projects/<int:project_id>/join/ajax/', views.join_project_ajax, name='join_project_ajax'),
-
+    path('tasks/<int:task_id>/toggle_complete/', views.toggle_task_completion, name='toggle_task_completion')
 
 
 

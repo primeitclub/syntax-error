@@ -12,7 +12,7 @@ class StudentAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('user', 'user_name', 'email', 'points', 'description', 'address', 'interest_fields', 'number_of_connections', 'website_url', 'github_url', 'linkedin_url')
+            'fields': ('user', 'user_name', 'email', 'points', 'description', 'address', 'interest_fields', 'connections', 'website_url', 'github_url', 'linkedin_url')
         }),
         ('Skills', {
             'fields': ('skills',)

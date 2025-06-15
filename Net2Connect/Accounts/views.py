@@ -187,7 +187,8 @@ def editprofile(request):
 
         # Save student
         student.save()
-        return redirect('account:profile')
+        return redirect('account:my_profile', username=request.user.username)
+
 
     # Assuming Student model has an avatar field or user profile does:
     avatar_url = None

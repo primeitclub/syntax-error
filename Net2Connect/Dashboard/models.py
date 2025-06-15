@@ -157,19 +157,26 @@ class Project(models.Model):
 
 
 class Task(models.Model):
-    project = models.ForeignKey(
-        Project, on_delete=models.CASCADE, related_name='tasks')
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+    ]
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='tasks')
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    assigned_to = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, blank=True)
-    is_completed = models.BooleanField(default=False)
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    verification_file = models.FileField(upload_to='task_verifications/', blank=True, null=True)
+    verification_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
 
 
+    
 class PendingInvitation(models.Model):
     email = models.EmailField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE)

@@ -3,6 +3,7 @@
 {% block title %}Project Details - {{ project.title }}{% endblock %}
 
 {% block content %}
+{% load static %}
 <div class="container my-5">
 
   <h1 class="mb-4 fw-bold">{{ project.title }}</h1>
@@ -22,6 +23,54 @@
     <h3>Description</h3>
     <p class="fs-5">{{ project.description|linebreaks }}</p>
   </section>
+
+  <section class="mb-5">
+  <h3>Resources</h3>
+
+  {% with project.tasks.all as task_resources %}
+    {% with task_resources|dictsortreversed:"created_at" as sorted_tasks %}
+      {% with sorted_tasks|dictsortreversed:"created_at"|dictsort:"title" as sorted_tasks %}
+        {% if sorted_tasks %}
+          <ul class="list-group">
+            {% for task in sorted_tasks %}
+              {% if task.verification_file or task.verification_url %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    {% if task.verification_file %}
+                      <a href="{{ task.verification_file.url }}" target="_blank" download>
+                        {{ task.title }} - File
+                      </a>
+                    {% endif %}
+
+                    {% if task.verification_url %}
+                      <br>
+                      <a href="{{ task.verification_url }}" target="_blank">
+                        {{ task.title }} - Link
+                      </a>
+                    {% endif %}
+
+                    {% if task.description %}
+                      <small class="text-muted d-block">{{ task.description }}</small>
+                    {% endif %}
+                  </div>
+                  {% if task.verification_file %}
+                    <span class="badge bg-secondary">
+                      {{ task.verification_file.size|filesizeformat }}
+                    </span>
+                  {% endif %}
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p><em>No resources added yet.</em></p>
+        {% endif %}
+      {% endwith %}
+    {% endwith %}
+  {% endwith %}
+</section>
+
+
 
   <section class="mb-5">
     <h3>Required Skills</h3>
@@ -87,108 +136,139 @@
     {% endif %}
   </section>
 
-  <!-- Tasks & Comments Section -->
+  <!-- Task Management Section -->
   <div class="row gy-4">
 
+    <!-- Task Creation Form -->
     <div class="col-md-6">
-      <h4>Tasks</h4>
-      <ul id="taskList" class="list-group mb-3">
-        {% if tasks %}
-          {% for task in tasks %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <div class="form-check d-flex align-items-center">
-                <input 
-                  class="form-check-input me-2 task-checkbox" 
-                  type="checkbox" 
-                  id="task-{{ forloop.counter }}" 
-                  data-task-id="{{ task.id }}"
-                  {% if task.is_completed %} checked {% endif %}
-                  {% if task.assigned_to != user %} disabled {% endif %}
-                >
-                <label class="form-check-label" for="task-{{ forloop.counter }}">{{ task.title }}</label>
-              </div>
-              {% if user == project.owner %}
-                <!-- Delete disabled for now -->
-                <button class="btn btn-sm btn-outline-danger delete-task-btn" title="Delete Task" disabled>&times;</button>
-              {% endif %}
-            </li>
-          {% endfor %}
-        {% else %}
-          <li class="list-group-item">No tasks yet.</li>
-        {% endif %}
-      </ul>
-
+      <h4>Add New Task</h4>
       {% if user == project.owner %}
-        <!-- Add Task Button -->
-        <button id="addTaskBtn" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">+ Add Task</button>
-
-        <!-- Task Modal -->
-        <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <form method="post">
-                {% csrf_token %}
-                <div class="modal-header">
-                  <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                  <div class="mb-3">
-                    <label for="{{ task_form.title.id_for_label }}" class="form-label">Title</label>
-                    {{ task_form.title }}
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="{{ task_form.description.id_for_label }}" class="form-label">Description</label>
-                    {{ task_form.description }}
-                  </div>
-
-                  <div class="mb-3">
-                    <label for="{{ task_form.assigned_to.id_for_label }}" class="form-label">Assign To</label>
-                    <select name="assigned_to" class="form-select" id="{{ task_form.assigned_to.id_for_label }}">
-                      {% for user_in_form in task_form.fields.assigned_to.queryset %}
-                        {% if user_in_form in project.members.all %}
-                          <option value="{{ user_in_form.id }}">{{ user_in_form.username }} (accepted)</option>
-                        {% elif user_in_form in project.invited_users.all %}
-                          <option value="{{ user_in_form.id }}">{{ user_in_form.username }} (invited)</option>
-                        {% endif %}
-                      {% endfor %}
-                    </select>
-                  </div>
-                </div>
-
-                <div class="modal-footer">
-                  <button type="submit" name="add_task" class="btn btn-primary">Add Task</button>
-                </div>
-              </form>
-            </div>
-          </div>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="add_task">
+        <div class="mb-3">
+          <label for="{{ task_form.title.id_for_label }}" class="form-label">Title</label>
+          {{ task_form.title }}
         </div>
+        <div class="mb-3">
+          <label for="{{ task_form.description.id_for_label }}" class="form-label">Description</label>
+          {{ task_form.description }}
+        </div>
+        <div class="mb-3">
+          <label for="{{ task_form.assigned_to.id_for_label }}" class="form-label">Assign To</label>
+          <select name="assigned_to" class="form-select" id="{{ task_form.assigned_to.id_for_label }}">
+            {% for user_in_form in task_form.fields.assigned_to.queryset %}
+              {% if user_in_form in project.members.all %}
+                <option value="{{ user_in_form.id }}"
+                  {% if task_form.assigned_to.value|stringformat:"s" == user_in_form.id|stringformat:"s" %}
+                    selected
+                  {% endif %}
+                >{{ user_in_form.username }} (accepted)</option>
+              {% elif user_in_form in project.invited_users.all %}
+                <option value="{{ user_in_form.id }}"
+                  {% if task_form.assigned_to.value|stringformat:"s" == user_in_form.id|stringformat:"s" %}
+                    selected
+                  {% endif %}
+                >{{ user_in_form.username }} (invited)</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary">Create Task</button>
+        </div>
+      </form>
+      {% else %}
+      <p><em>Only project owners can create tasks.</em></p>
       {% endif %}
+    </div>
+    <section class="mb-5">
+  <h3>Tasks ({{ tasks.count }})</h3>
+  {% if tasks %}
+    <ul class="list-group">
+      {% for task in tasks %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ task.title }}</strong> — assigned to: 
+            {% if task.assigned_to %}
+              {{ task.assigned_to.username }}
+            {% else %}
+              Unassigned
+            {% endif %}
+          </div>
+          <div>
+            <span 
+              class="badge 
+              {% if task.status == 'pending' %}bg-warning
+              {% elif task.status == 'in_progress' %}bg-info
+              {% elif task.status == 'completed' %}bg-success
+              {% else %}bg-secondary
+              {% endif %}">
+              {{ task.get_status_display }}
+            </span>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p><em>No tasks created yet.</em></p>
+  {% endif %}
+</section>
 
-      <div class="progress mt-3" style="height: 20px;">
-        <div id="progress-bar" class="progress-bar bg-danger" role="progressbar" style="width: 0%;">0%</div>
-      </div>
-      <small id="progress-text" class="text-muted mt-1 d-block">0 / 0 tasks completed</small>
 
-      <div id="clap-gif-container" class="mt-3 text-center" style="display:none;">
-        <img src="https://media.giphy.com/media/4T7e4DmcrP9du/giphy.gif" alt="Clap GIF" style="max-width: 120px;">
-        <p class="fw-semibold mt-2">Great job! All tasks completed!</p>
-      </div>
+    <!-- Task Completion Form -->
+    <div class="col-md-6">
+      <h4>Submit Task Completion</h4>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="complete_task">
+
+        <div class="mb-3">
+          <label for="task_id" class="form-label">Select Task</label>
+          <select name="task_id" id="task_id" class="form-select">
+            {% for task in tasks %}
+              {% if task.assigned_to == user %}
+                <option value="{{ task.id }}">{{ task.title }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="completion_status" class="form-label">Status</label>
+          <select name="completion_status" id="completion_status" class="form-select">
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="blocked">Blocked</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="proof_file" class="form-label">Upload File (optional)</label>
+          <input type="file" name="proof_file" id="proof_file" class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label for="proof_url" class="form-label">Verification URL (optional)</label>
+          <input type="url" name="proof_url" id="proof_url" class="form-control" placeholder="https://example.com/my-work">
+        </div>
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-success">Submit Completion</button>
+        </div>
+      </form>
     </div>
 
   </div>
+
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
 <style>
-  /* Smooth progress bar transition */
   #progress-bar {
     transition: width 0.5s ease;
   }
-  /* Color classes */
   .bg-danger {
     background-color: #dc3545 !important;
   }
@@ -202,108 +282,53 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const taskList = document.getElementById('taskList');
-  const progressBar = document.getElementById('progress-bar');
-  const progressText = document.getElementById('progress-text');
-  const clapGifContainer = document.getElementById('clap-gif-container');
-
-  if (!taskList) return;
-
-  function updateProgress() {
-    const tasks = taskList.querySelectorAll('li');
-    // Detect if no tasks (or placeholder text)
-    if (tasks.length === 0 || (tasks.length === 1 && tasks[0].textContent.trim() === 'No tasks yet.')) {
-      progressText.textContent = `0 / 0 tasks completed`;
-      progressBar.style.width = '0%';
-      progressBar.textContent = '0%';
-      progressBar.classList.remove('bg-success', 'bg-warning');
-      progressBar.classList.add('bg-danger');
-      clapGifContainer.style.display = 'none';
-      return;
-    }
-
-    const totalTasks = tasks.length;
-    let completedTasks = 0;
-    tasks.forEach(task => {
-      const checkbox = task.querySelector('input[type="checkbox"]');
-      if (checkbox && checkbox.checked) completedTasks++;
-    });
-
-    progressText.textContent = `${completedTasks} / ${totalTasks} tasks completed`;
-
-    const percent = (completedTasks / totalTasks) * 100;
-    progressBar.style.width = `${percent}%`;
-    progressBar.textContent = `${Math.round(percent)}%`;
-
-    // Update progress bar color
-    progressBar.classList.remove('bg-success', 'bg-warning', 'bg-danger');
-    if (percent === 100) {
-      progressBar.classList.add('bg-success');
-    } else if (percent >= 50) {
-      progressBar.classList.add('bg-warning');
-    } else {
-      progressBar.classList.add('bg-danger');
-    }
-
-    clapGifContainer.style.display = (percent === 100) ? 'block' : 'none';
-  }
-
-  function getCSRFToken() {
-    const tokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
-    return tokenElement ? tokenElement.value : null;
-  }
-
-  function toggleTaskCompletion(taskId, isCompleted, checkbox) {
-    const csrfToken = getCSRFToken();
-    if (!csrfToken) {
-      alert('CSRF token missing! Cannot update task status.');
-      checkbox.checked = !isCompleted;
-      return;
-    }
-
-    checkbox.disabled = true; // disable while request in progress
-
-    fetch("{% url 'dashboard:toggle_task_complete' %}", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-      },
-      body: JSON.stringify({ task_id: taskId, is_completed: isCompleted })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (!data.success) {
-        alert(data.error || 'Error updating task status.');
-        checkbox.checked = !isCompleted; // revert on failure
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
       }
-      updateProgress();
-    })
-    .catch(() => {
-      alert('Error updating task status.');
-      checkbox.checked = !isCompleted;
-    })
-    .finally(() => {
-      checkbox.disabled = false; // re-enable checkbox
+    }
+    return cookieValue;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const taskCheckboxes = document.querySelectorAll('.task-checkbox');
+    const csrftoken = getCookie('csrftoken');
+
+    taskCheckboxes.forEach(cb => {
+      if (!cb.disabled) {
+        cb.addEventListener('change', () => {
+          const taskId = cb.dataset.taskId;
+          const isCompleted = cb.checked;
+
+          fetch(`/tasks/${taskId}/toggle_complete/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({ is_completed: isCompleted }),
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (!data.success) {
+              console.error('Error updating task:', data.error);
+              cb.checked = !isCompleted;
+            }
+          })
+          .catch(error => {
+            console.error('Fetch error:', error);
+            cb.checked = !isCompleted;
+          });
+        });
+      }
     });
-  }
-
-  function attachCheckboxListener(checkbox) {
-    checkbox.addEventListener('change', () => {
-      const taskId = checkbox.getAttribute('data-task-id');
-      if (!taskId) return;
-      toggleTaskCompletion(taskId, checkbox.checked, checkbox);
-    });
-  }
-
-  function attachListenersToAllCheckboxes() {
-    const checkboxes = taskList.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(cb => attachCheckboxListener(cb));
-  }
-
-  attachListenersToAllCheckboxes();
-  updateProgress();
-});
+  });
 </script>
 {% endblock %}

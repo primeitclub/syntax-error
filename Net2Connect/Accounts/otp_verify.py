@@ -9,7 +9,7 @@ def verify_otp_view(request):
 
         user_id = request.session.get('pending_user_id')
         if not user_id:
-            return redirect('register')  
+            return redirect('account:register')  
 
         try:
             user = User.objects.get(id=user_id)
@@ -31,7 +31,7 @@ def verify_otp_view(request):
             otp_record.delete()
             request.session.pop('pending_user_id', None)
 
-            return redirect('dashboard:dashboard')
+            return redirect('account:login')
         else:
             return render(request, 'registration/verify_otp.html', {'error': 'Invalid OTP'})
 

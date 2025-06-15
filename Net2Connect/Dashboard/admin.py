@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Project, Categories
+from .models import Project, Categories , Task
 from Accounts.models import Skill
 
 @admin.register(Project)
@@ -44,3 +44,30 @@ class SkillAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     search_fields = ('name',)
     ordering = ('name',)
+
+
+
+from django.utils.html import format_html
+
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ('title', 'assigned_to', 'status', 'view_verification')
+    list_filter = ('status', 'assigned_to')
+    search_fields = ('title', 'description', 'assigned_to__username')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at',)
+
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'description', 'assigned_to', 'status', 'verification_file', 'verification_url')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at',)
+        }),
+    )
+
+    def view_verification(self, obj):
+        if obj.verification_file:
+            return format_html('<a href="{}" target="_blank">View File</a>', obj.verification_file.url)
+        return "No file"
+    view_verification.short_description = "Verification File"

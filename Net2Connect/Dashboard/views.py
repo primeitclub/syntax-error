@@ -1,3 +1,5 @@
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse, HttpResponseBadRequest
 import json
 from .forms import TaskForm
 from .models import Project
@@ -418,6 +420,86 @@ def join_project_ajax(request, project_id):
         return JsonResponse({'error': 'Failed to join project.'}, status=400)
 
 
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+import json
+
+from .models import Task  # Ensure correct import
+
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404
+import json
+
+@method_decorator(csrf_exempt, name='dispatch')
+@method_decorator(login_required, name='dispatch')
+@require_POST
+def toggle_task_completion(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+
+    # Ensure only the assigned user can update this task
+    if task.assigned_to != request.user:
+        return JsonResponse({"error": "Permission denied"}, status=403)
+
+    # Handle form-data with file
+    if request.content_type.startswith('multipart/form-data'):
+        is_completed = request.POST.get('is_completed')
+        if is_completed is None:
+            return HttpResponseBadRequest("Missing 'is_completed' value")
+
+        is_completed = is_completed.lower() == 'true'
+        resource_link = request.POST.get('resource_link', '').strip()
+        resource_file = request.FILES.get('resource_file')
+
+        task.status = 'completed' if is_completed else 'pending'
+        task.verification_url = resource_link or None
+
+        if resource_file:
+            task.verification_file = resource_file
+        elif not is_completed:
+            task.verification_file = None
+
+        task.save()
+
+    # Handle JSON payload
+    elif request.content_type == 'application/json':
+        try:
+            data = json.loads(request.body)
+            is_completed = data.get('is_completed')
+            if is_completed is None:
+                return HttpResponseBadRequest("Missing 'is_completed' value")
+
+            is_completed = bool(is_completed)
+            resource_link = data.get('resource_link', '').strip()
+
+            task.status = 'completed' if is_completed else 'pending'
+            task.verification_url = resource_link or None
+
+            if not is_completed:
+                task.verification_file = None
+
+            task.save()
+
+        except json.JSONDecodeError as e:
+            return JsonResponse({"error": f"Invalid JSON: {str(e)}"}, status=400)
+
+    else:
+        return JsonResponse({"error": "Unsupported Content-Type"}, status=415)
+
+    return JsonResponse({
+        "success": True,
+        "task_id": task.id,
+        "status": task.status,
+        "resource_link": task.verification_url or "",
+        "resource_file_url": task.verification_file.url if task.verification_file else ""
+    })
+
 # leave Project view
 
 
@@ -439,72 +521,69 @@ def leave_project(request, project_id):
     })
 
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.core.files.storage import default_storage
+from django.utils import timezone
+from .models import Project, Task
+
 @login_required
 def project_detail(request, project_id):
     project = get_object_or_404(Project, id=project_id)
+    tasks = Task.objects.filter(project=project)
     members_without_owner = project.members.exclude(id=project.owner.id)
-
-    assignable_user_ids = list(project.members.values_list(
-        'id', flat=True)) + list(project.invited_users.values_list('id', flat=True))
-    assignable_users = User.objects.filter(
-        id__in=assignable_user_ids).distinct()
-
-    tasks = project.tasks.select_related('assigned_to')
-
-    task_form = TaskForm(assignable_users=assignable_users)
+    assignable_users = project.members.all()
 
     if request.method == 'POST':
-        if 'add_task' in request.POST:
-            task_form = TaskForm(
-                request.POST, assignable_users=assignable_users)
+        form_type = request.POST.get('form_type')
+
+        if form_type == 'add_task' and request.user == project.owner:
+            task_form = TaskForm(request.POST, assignable_users=assignable_users)
             if task_form.is_valid():
-                task = task_form.save(commit=False)
-                task.project = project
-                task.save()
+                new_task = task_form.save(commit=False)
+                new_task.project = project
+                new_task.save()
                 return redirect('dashboard:project_detail', project_id=project.id)
 
-    return render(request, 'project_detail.html', {
+        elif form_type == 'complete_task':
+            task_form = TaskForm(assignable_users=assignable_users)  # fallback
+
+            task_id = request.POST.get('task_id')
+            completion_status = request.POST.get('completion_status')
+            proof_file = request.FILES.get('proof_file')
+            proof_url = request.POST.get('proof_url', '').strip()
+
+            task = Task.objects.filter(id=task_id, project=project, assigned_to=request.user).first()
+            if not task:
+                # Task not found or not assigned to user
+                return redirect('dashboard:project_detail', project_id=project.id)
+
+            # Update task with completion info
+            task.status = completion_status
+            if proof_file:
+                task.verification_file.save(proof_file.name, proof_file, save=False)
+            if proof_url:
+                task.verification_url = proof_url
+
+            task.save()
+            return redirect('dashboard:project_detail', project_id=project.id)
+
+        else:
+            task_form = TaskForm(assignable_users=assignable_users)
+
+    else:
+        task_form = TaskForm(assignable_users=assignable_users)
+
+    context = {
         'project': project,
         'tasks': tasks,
         'task_form': task_form,
-        'members': project.members.all(),
         'members_without_owner': members_without_owner,
-    })
+    }
+    return render(request, 'project_detail.html', context)
 
 
-@login_required
-def toggle_task_complete(request):
-    try:
-        data = json.loads(request.body)
-        task_id = data.get('task_id')
-        is_completed = data.get('is_completed')
 
-        task = get_object_or_404(Task, id=task_id)
-
-        # Authorization check
-        if task.assigned_to != request.user:
-            return JsonResponse({'success': False, 'error': 'Not authorized'}, status=403)
-
-        task.is_completed = is_completed
-        task.save()
-
-        # Calculate progress for the project
-        project = task.project
-        total = project.tasks.count()
-        completed = project.tasks.filter(is_completed=True).count()
-        progress = int((completed / total) * 100) if total > 0 else 0
-
-        return JsonResponse({
-            'success': True,
-            'is_completed': task.is_completed,
-            'progress': progress,
-            'completed_tasks': completed,
-            'total_tasks': total,
-        })
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)}, status=400)
-
-# Removed @login_required for testing
 
 
 def project_list(request):

@@ -14,3 +14,11 @@ class TaskForm(forms.ModelForm):
         model = Task
         fields = ['title', 'description', 'assigned_to']
 
+
+from django import forms
+from .models import Task
+
+class TaskCompletionForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['status', 'verification_file', 'verification_url']
