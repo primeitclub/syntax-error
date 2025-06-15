@@ -1,0 +1,79 @@
+{% extends "dashboard.html" %}
+
+{% block title %}Leave Project - {{ project.title }}{% endblock %}
+
+{% block content %}
+
+<style>
+  .leave-project-container {
+    max-width: 480px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 6px 12px rgb(0 0 0 / 0.1);
+    text-align: center;
+  }
+
+  .leave-project-container h1 {
+    color: #d9534f; /* Bootstrap red */
+    margin-bottom: 1rem;
+  }
+
+  .project-info {
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    color: #555;
+  }
+
+  .btn-confirm {
+    background-color: #d9534f;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.4rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 1rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn-confirm:hover {
+    background-color: #c9302c;
+  }
+
+  .btn-cancel {
+    background-color: #6c757d;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.4rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn-cancel:hover {
+    background-color: #5a6268;
+  }
+</style>
+
+<div class="leave-project-container">
+  <h1>Leave Project</h1>
+  <p class="project-info">
+    Are you sure you want to leave the project <strong>"{{ project.title }}"</strong>?
+  </p>
+  <p class="project-info">
+    Current members: {{ project.member_count }}/{{ project.max_members }}<br>
+    Status: {{ project.get_status_display }}
+  </p>
+
+  <form method="post" action="{% url 'dashboard:leave_project' project.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn-confirm">Yes, Leave Project</button>
+    <a href="{% url 'dashboard:project_detail' project.id %}" class="btn-cancel">Cancel</a>
+  </form>
+</div>
+
+{% endblock %}

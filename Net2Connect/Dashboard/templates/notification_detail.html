@@ -1,0 +1,152 @@
+{% load custom_tags %}
+
+{% if notification.project %}
+  <hr style="margin: 2rem 0; border-color: #ddd;">
+
+  <div class="project-card">
+    <h3 class="project-title">{{ notification.project.title }}</h3>
+    <div class="project-meta">
+      <div><strong>Owner:</strong> <span>{{ notification.project.owner.student.get_full_name|default:notification.project.owner.student.username }}</span></div>
+      <div><strong>Start Date:</strong> <span>{{ notification.project.start_date|date:"M d, Y" }}</span></div>
+      <div><strong>End Date:</strong> <span>{{ notification.project.end_date|date:"M d, Y" }}</span></div>
+      <div><strong>Your Status:</strong> 
+        <span class="status-badge status-{{ notification.student|status_class:notification.project }}">
+          {% if notification.student in notification.project.invited_users.all %}
+            Invited
+          {% elif notification.student in notification.project.members.all %}
+            Member
+          {% else %}
+            Not associated
+          {% endif %}
+        </span>
+      </div>
+    </div>
+
+    <section class="project-actions">
+      {% if user == notification.project.owner %}
+        <p class="owner-note">You are the <strong>owner</strong> of this project.</p>
+      {% else %}
+        {% if notification.student in notification.project.members.all %}
+          <p class="member-note">You are already a member.</p>
+          <form method="post" action="{% url 'dashboard:leave_project' notification.project.id %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning btn-sm">Leave Project</button>
+          </form>
+        {% elif notification.project.members.count < notification.project.max_members %}
+          {% if notification.project.access_type == 'open' %}
+            <form method="post" action="{% url 'dashboard:join_project' notification.project.id %}" class="inline-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success btn-sm">Join Project</button>
+            </form>
+          {% elif notification.project.access_type == 'invite' and notification.student in notification.project.invited_users.all %}
+            <form method="post" action="{% url 'dashboard:join_project' notification.project.id %}" class="inline-form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success btn-sm">Accept Invitation</button>
+            </form>
+          {% else %}
+            <button class="btn btn-secondary btn-sm" disabled>Joining Not Allowed</button>
+          {% endif %}
+        {% else %}
+          <button class="btn btn-secondary btn-sm" disabled>Project Full</button>
+        {% endif %}
+      {% endif %}
+    </section>
+  </div>
+
+  <style>
+    .project-card {
+      background: #fefefe;
+      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 700px;
+      margin: 1rem auto 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .project-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 16px;
+      border-bottom: 2px solid #4caf50;
+      padding-bottom: 6px;
+    }
+    .project-meta > div {
+      margin-bottom: 10px;
+      font-size: 1rem;
+      color: #444;
+    }
+    .project-meta strong {
+      color: #333;
+      width: 120px;
+      display: inline-block;
+    }
+    .status-badge {
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 12px;
+      color: rgb(13, 10, 10);
+      font-size: 0.9rem;
+      vertical-align: middle;
+    }
+    .status-Invited {
+      background-color: #ff9800;
+    }
+    .status-Member {
+      background-color: #4caf50;
+    }
+    .status-Not {
+      background-color: #999;
+    }
+    .project-actions {
+      margin-top: 1.8rem;
+    }
+    .owner-note, .member-note {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+    .inline-form {
+      display: inline-block;
+      margin: 0;
+    }
+    button.btn {
+      cursor: pointer;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 5px;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+    button.btn-sm {
+      font-size: 0.9rem;
+      padding: 6px 14px;
+    }
+    button.btn-success {
+      background-color: #4caf50;
+      color: white;
+    }
+    button.btn-success:hover {
+      background-color: #43a047;
+    }
+    button.btn-warning {
+      background-color: #ff9800;
+      color: white;
+    }
+    button.btn-warning:hover {
+      background-color: #fb8c00;
+    }
+    button.btn-secondary {
+      background-color: #bbb;
+      color: #444;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  </style>
+
+{% else %}
+  <p><em>No related project information available.</em></p>
+{% endif %}

@@ -1,1027 +1,209 @@
 {% extends "dashboard.html" %}
-{% block title %}Collabs{% endblock %}
+
+{% block title %}Collaboration Projects{% endblock %}
+
 {% block content %}
 
 <style>
-  :root {
-    --primary-color: #4361ee;
-    --primary-hover: #3a56d4;
-    --success-color: #4cc9f0;
-    --danger-color: #f72585;
-    --warning-color: #f8961e;
-    --light-bg: #f8f9fa;
-    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --card-hover-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
-
-  .collab-main {
-    padding: 2rem;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    height: 100vh;
-    overflow-y: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    background-color: var(--light-bg);
-  }
-
-  .collab-main::-webkit-scrollbar {
-    display: none;
-  }
-
-  .header-section {
+  /* Container */
+  .collab-container {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-top: 1.5rem;
   }
 
-  .page-title {
-    font-size: 1.75rem;
+  /* Sections */
+  .collab-section {
+    flex: 1 1 320px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+    padding: 1.5rem 1.8rem;
+    min-width: 280px;
+    transition: transform 0.15s ease-in-out;
+  }
+
+  .collab-section:hover {
+    box-shadow: 0 8px 16px rgb(0 0 0 / 0.15);
+  }
+
+  /* Section Headings */
+  .collab-section h2 {
+    margin-top: 0;
+    margin-bottom: 1.2rem;
     font-weight: 700;
-    color: #2b2d42;
+    font-size: 1.4rem;
+    color: #0056b3;
+    border-bottom: 3px solid #0056b3;
+    padding-bottom: 0.3rem;
+  }
+
+  /* Project List */
+  ul.project-list {
+    list-style: none;
+    padding: 0;
     margin: 0;
   }
 
-  .create-button {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 2px 10px rgba(67, 97, 238, 0.3);
-  }
-
-  .create-button:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.4);
-  }
-
-  .create-button i {
-    font-size: 1rem;
-  }
-
-  .section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #2b2d42;
-    margin: 1.5rem 0 1rem;
-    position: relative;
-    padding-left: 1rem;
-  }
-
-  .section-title::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 70%;
-    width: 4px;
-    background-color: var(--primary-color);
-    border-radius: 4px;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 2rem;
-    background: white;
-    border-radius: 12px;
-    box-shadow: var(--card-shadow);
-    margin: 1rem 0;
-  }
-
-  .empty-state i {
-    font-size: 3rem;
-    color: #adb5bd;
-    margin-bottom: 1rem;
-  }
-
-  .empty-state p {
-    color: #6c757d;
-    margin-bottom: 1.5rem;
-  }
-
-  .empty-state .action-btn {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 0.5rem 1.5rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: var(--transition);
-  }
-
-  .empty-state .action-btn:hover {
-    background-color: var(--primary-hover);
-  }
-
-  /* Project Grid Styles */
-  .project-grid-wrapper {
-    position: relative;
-    margin: 1rem 0 2rem;
-  }
-
-  .project-grid {
-    display: flex;
-    gap: 1.5rem;
-    overflow-x: auto;
+  ul.project-list li {
     padding: 1rem 0;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .project-grid::-webkit-scrollbar {
-    display: none;
-  }
-
-  .project-card {
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: var(--card-shadow);
-    padding: 1.5rem;
-    min-width: 280px;
-    width: 280px;
-    cursor: pointer;
-    transition: var(--transition);
+    border-bottom: 1px solid #eee;
     display: flex;
     flex-direction: column;
-    position: relative;
-    flex: 0 0 auto;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    gap: 0.3rem;
   }
 
-  .project-card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--card-hover-shadow);
+  ul.project-list li:last-child {
+    border-bottom: none;
   }
 
-  .project-card .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-  }
-
+  /* Project Title and Owner */
   .project-title {
-    font-weight: 700;
     font-size: 1.1rem;
-    color: #2b2d42;
-    margin-right: 1.5rem;
-    line-height: 1.4;
-  }
-
-  .status-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: #212529;
   }
 
-  .status-ongoing {
-    background-color: rgba(67, 97, 238, 0.1);
-    color: var(--primary-color);
-  }
-
-  .status-completed {
-    background-color: rgba(76, 201, 240, 0.1);
-    color: var(--success-color);
-  }
-
-  .project-desc {
-    font-size: 0.85rem;
-    color: #6c757d;
-    margin-bottom: 1.25rem;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .meta-info {
-    margin-top: auto;
-  }
-
-  .deadline {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    margin-bottom: 1rem;
+  .project-owner {
+    font-size: 0.9rem;
     color: #6c757d;
   }
 
-  .deadline i {
-    font-size: 1rem;
-  }
-
-  .deadline.urgent {
-    color: var(--danger-color);
-    font-weight: 600;
-  }
-
-  .progress-container {
-    margin-bottom: 0.75rem;
-  }
-
-  .progress-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    font-size: 0.75rem;
-    color: #6c757d;
-  }
-
-  .progress-bar {
-    background-color: #e9ecef;
-    border-radius: 10px;
-    overflow: hidden;
-    height: 8px;
-  }
-
-  .progress {
-    height: 100%;
-    border-radius: 10px;
-    transition: width 0.5s ease;
-  }
-
-  .progress-ongoing {
-    background: linear-gradient(90deg, var(--primary-color), #4895ef);
-  }
-
-  .progress-completed {
-    background: linear-gradient(90deg, var(--success-color), #4cc9f0);
-  }
-
-  .members-preview {
-    display: flex;
-    align-items: center;
-    margin-top: 1rem;
-  }
-
-  .member-avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    margin-right: -8px;
-    border: 2px solid white;
-    background-color: #dee2e6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    font-weight: 600;
+  /* Project Meta Info */
+  .project-meta {
+    font-size: 0.9rem;
     color: #495057;
   }
 
-  .more-members {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background-color: #e9ecef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #6c757d;
+  /* Actions */
+  .project-actions {
+    margin-top: 0.6rem;
   }
 
-  /* Scroll Buttons */
-  .scroll-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: white;
-    border: none;
-    color: var(--primary-color);
-    font-size: 1.25rem;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    border-radius: 50%;
-    z-index: 10;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .scroll-btn:hover {
-    background-color: var(--primary-color);
-    color: white;
-    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
-  }
-
-  .scroll-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: white;
-    color: #adb5bd;
-  }
-
-  .left-btn {
-    left: -20px;
-  }
-
-  .right-btn {
-    right: -20px;
-  }
-
-  /* Create Project Modal */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-  }
-
-  .modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .create-form {
-    width: 500px;
-    max-width: 90%;
-    max-height: 90vh;
-    overflow-y: auto;
-    background-color: white;
-    border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    padding: 2rem;
-    transform: translateY(20px);
-    transition: all 0.3s ease;
-  }
-
-  .modal-overlay.active .create-form {
-    transform: translateY(0);
-  }
-
-  .form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-
-  .form-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #2b2d42;
-    margin: 0;
-  }
-
-  .close-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #6c757d;
-    transition: var(--transition);
-  }
-
-  .close-btn:hover {
-    color: var(--danger-color);
-  }
-
-  .form-group {
-    margin-bottom: 1.25rem;
-  }
-
-  .form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #495057;
-    font-size: 0.9rem;
-  }
-
-  .form-control {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    transition: var(--transition);
-  }
-
-  .form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-    outline: none;
-  }
-
-  textarea.form-control {
-    min-height: 100px;
-    resize: vertical;
-  }
-
-  select.form-control {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1rem;
-  }
-
-  select[multiple].form-control {
-    background-image: none;
-    height: auto;
-  }
-
-  .form-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 1.5rem;
-  }
-
-  .btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    border: none;
-  }
-
-  .btn-primary {
-    background-color: var(--primary-color);
-    color: white;
-  }
-
-  .btn-primary:hover {
-    background-color: var(--primary-hover);
-  }
-
-  .btn-outline {
-    background-color: transparent;
-    border: 1px solid #dee2e6;
-    color: #495057;
-  }
-
-  .btn-outline:hover {
-    background-color: #f8f9fa;
-  }
-
-  /* Fellows Section */
-  .fellows-section {
-    margin-top: 1.5rem;
-    border-top: 1px solid #dee2e6;
-    padding-top: 1.5rem;
-  }
-
-  .add-fellow-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: none;
-    border: none;
-    color: var(--primary-color);
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0.5rem 0;
-    font-size: 0.9rem;
-  }
-
-  .add-fellow-btn i {
-    font-size: 1rem;
-  }
-
-  .fellow-input-container {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-    align-items: center;
-  }
-
-  .fellow-input {
-    flex: 1;
-    padding: 0.75rem;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    font-size: 0.9rem;
-  }
-
-  .add-confirm-btn {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-  }
-
-  .fellows-list {
-    margin-top: 1rem;
-    max-height: 150px;
-    overflow-y: auto;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 0.5rem;
-  }
-
-  .fellow-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    background-color: #f8f9fa;
+  .project-actions a,
+  .project-actions button {
+    display: inline-block;
+    text-decoration: none;
+    padding: 0.35rem 0.9rem;
     border-radius: 6px;
-    margin-bottom: 0.5rem;
-  }
-
-  .fellow-item:last-child {
-    margin-bottom: 0;
-  }
-
-  .remove-fellow {
-    background: none;
-    border: none;
-    color: var(--danger-color);
+    font-size: 0.9rem;
     cursor: pointer;
-    font-size: 1.1rem;
-    padding: 0.25rem;
-    line-height: 1;
+    transition: background-color 0.2s ease-in-out;
   }
 
-  /* Responsive Adjustments */
+  .project-actions a {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+  }
+
+  .project-actions a:hover {
+    background-color: #0056b3;
+  }
+
+  .create-project-link {
+    padding: 0.6rem;
+    background-color:rgb(59, 183, 88);
+    border-radius: 6px;
+  }
+  .create-project-link:hover {
+    border-radius: 6px;
+    padding: 0.6rem;
+    background-color: rgb(46, 145, 70);
+    color: #fff;
+  }
+
+
+  /* Responsive */
   @media (max-width: 768px) {
-    .collab-main {
-      padding: 1rem;
-    }
-    
-    .project-card {
-      min-width: 240px;
-      width: 240px;
-    }
-    
-    .scroll-btn {
-      width: 36px;
-      height: 36px;
-      font-size: 1rem;
-    }
-    
-    .left-btn {
-      left: -10px;
-    }
-    
-    .right-btn {
-      right: -10px;
+    .collab-container {
+      flex-direction: column;
     }
 
     .project-link {
-  text-decoration: none;
-  color: inherit;
-  display: inline-block;
-}
+      text-decoration: none;
+      color: inherit;
+      display: inline-block;
+    }
 
   }
 </style>
 
-<div class="collab-main">
-  <div class="header-section">
-    <h1 class="page-title">My Collaborations</h1>
-    <button class="create-button" id="create-project-btn">
-      <i class="fas fa-plus"></i> New Project
-    </button>
-  </div>
+<h1 class="mb-4" style="color:#004085;">Collaboration Projects</h1>
 
-  <h2 class="section-title">Ongoing Projects</h2>
-  {% if ongoing_projects %}
-  <div class="project-grid-wrapper">
-    <button class="scroll-btn left-btn" aria-label="Scroll left">
-      <i class="fas fa-chevron-left"><</i>
-    </button>
-    <div class="project-grid">
-      {% for project in ongoing_projects %}
-      <div class="project-card">
-        <div class="card-header">
-          <h3 class="project-title">{{ project.title }}</h3>
-          <span class="status-badge status-ongoing">In Progress</span>
-        </div>
-        <p class="project-desc">{{ project.description|default:"No description provided" }}</p>
-        <div class="meta-info">
-          <div class="deadline {% if project.is_urgent %}urgent{% endif %}">
-            <i class="far fa-calendar-alt"></i>
-            <span>Due {{ project.end_date }}</span>
-          </div>
-          <div class="progress-container">
-            <div class="progress-info">
-              <span>{{ project.completed_tasks }}/{{ project.total_tasks }} tasks</span>
-              <span>{{ project.progress_percentage }}%</span>
+<div class="collab-container">
+
+  <!-- Owned Projects -->
+  <section class="collab-section">
+    <h2>Your Projects (Owned)</h2>
+    {% if owned_projects %}
+      <ul class="project-list">
+        {% for project in owned_projects %}
+          <li>
+            <div class="project-title">{{ project.title }}</div>
+            <div class="project-meta">
+              Members: {{ project.member_count }}/{{ project.max_members }} | Status: {{ project.get_status_display }}
             </div>
-            <div class="progress-bar">
-              <div class="progress progress-ongoing" style="width: {{ project.progress_percentage }}%"></div>
+            <div class="project-actions">
+              <a href="{% url 'dashboard:project_detail' project.id %}">View Details</a>
             </div>
-          </div>
-          {% load static %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>You haven't created any projects yet.</p>
+    {% endif %}
+    <a href="{% url 'dashboard:add_project' %}" class="create-project-link">+ Create New Project</a>
+  </section>
 
-{% load static %}
+  <!-- Working Projects -->
+  <section class="collab-section">
+    <h2>Projects You're Working On</h2>
+    {% if working_projects %}
+      <ul class="project-list">
+        {% for project in working_projects %}
+          <li>
+            <div class="project-title">{{ project.title }}</div>
+            <div class="project-owner">by {{ project.owner.username }}</div>
+            <div class="project-meta">
+              Members: {{ project.member_count }}/{{ project.max_members }} | Status: {{ project.get_status_display }}
+            </div>
+            <div class="project-actions">
+              <a href="{% url 'dashboard:project_detail' project.id %}">View Details</a>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>You are not a member of any projects yet.</p>
+    {% endif %}
+  </section>
 
-<div class="members-preview">
-  {% for member in project.members.all|slice:":3" %}
-    <div class="member-avatar" title="{{ member.get_full_name|default:member.username }}">
-      {% if member.student and member.student.image %}
-        <img src="{{ member.student.image.url }}" alt="{{ member.get_full_name|default:member.username }}">
-      {% else %}
-        <img src="{% static 'avatar7.png' %}" alt="{{ member.get_full_name|default:member.username }}">
-      {% endif %}
-    </div>
-  {% endfor %}
-  
-  {% if project.member_count > 3 %}
-    <div class="more-members" title="{{ project.member_count|add:'-3' }} more members">
-      +{{ project.member_count|add:'-3' }}
-    </div>
-  {% endif %}
+  <!-- Invited Projects -->
+  <section class="collab-section">
+    <h2>Projects You're Invited To</h2>
+    {% if invited_projects %}
+      <ul class="project-list">
+        {% for project in invited_projects %}
+          <li>
+            <div class="project-title">{{ project.title }}</div>
+            <div class="project-owner">by {{ project.owner.username }}</div>
+            <div class="project-meta">
+              Members: {{ project.member_count }}/{{ project.max_members }} | Status: {{ project.get_status_display }}
+            </div>
+            <div class="project-actions">
+              <a href="{% url 'dashboard:project_detail' project.id %}">View Details</a>
+              <!-- Add Accept/Reject buttons here if needed -->
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>You have no pending invitations.</p>
+    {% endif %}
+  </section>
+
 </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    <button class="scroll-btn right-btn" aria-label="Scroll right">
-      <i class="fas fa-chevron-right">></i>
-    </button>
-  </div>
-  {% else %}
-  <div class="empty-state">
-    <i class="far fa-folder-open"></i>
-    <h3>No Ongoing Projects</h3>
-    <p>You don't have any ongoing collaborations. Start a new project to begin working with others.</p>
-    <button class="action-btn" id="empty-state-create-btn">
-      <i class="fas fa-plus"></i> Create Project
-    </button>
-  </div>
-  {% endif %}
-
-  <h2 class="section-title">Completed Projects</h2>
-  {% if completed_projects %}
-  <div class="project-grid-wrapper">
-    <button class="scroll-btn left-btn" aria-label="Scroll left">
-      <i class="fas fa-chevron-left"><</i>
-    </button>
-    <div class="project-grid">
-      {% for project in completed_projects %}
-
-
-
-<a href="{% url 'dashboard:project_detail' project.id %}" style="text-decoration: none; color: inherit;">
-  <div class="project-card">
-    <div class="card-header">
-      <h3 class="project-title">sadsa</h3>
-      <span class="status-badge status-ongoing">In Progress</span>
-    </div>
-    <p class="project-desc">{{ project.description|default:"No description provided" }}</p>
-    <div class="meta-info">
-      <div class="deadline {% if project.is_urgent %}urgent{% endif %}">
-        <i class="far fa-calendar-alt"></i>
-        <span>Due {{ project.end_date }}</span>
-      </div>
-      <div class="progress-container">
-        <div class="progress-info">
-          <span>{{ project.completed_tasks }}/{{ project.total_tasks }} tasks</span>
-          <span>{{ project.progress_percentage }}%</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress progress-ongoing" style="width: {{ project.progress_percentage }}%"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</a>
-
-
-
-
-          <div class="members-preview">
-            {% for member in project.first_three_members %}
-            <div class="member-avatar" title="{{ member.name }}">
-              {{ member.initials }}
-            </div>
-            {% endfor %}
-            {% if project.members|length > 3 %}
-            <div class="more-members" title="{{ project.members|length|add:"-3" }} more">
-              +{{ project.members|length|add:"-3" }}
-            </div>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    <button class="scroll-btn right-btn" aria-label="Scroll right">
-      <i class="fas fa-chevron-right">></i>
-    </button>
-  </div>
-  {% else %}
-  <div class="empty-state">
-    <i class="far fa-check-circle"></i>
-    <h3>No Completed Projects</h3>
-    <p>Your completed collaborations will appear here once you finish ongoing projects.</p>
-  </div>
-  {% endif %}
-</div>
-
-<!-- Create Project Modal -->
-<div class="modal-overlay" id="create-modal">
-  <div class="create-form">
-    <div class="form-header">
-      <h3 class="form-title">Create New Project</h3>
-      <button class="close-btn" id="close-modal-btn">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    
-    <form method="POST" action="{% url 'dashboard:add_project' %}" id="project-form">
-      {% csrf_token %}
-      
-      <div class="form-group">
-        <label class="form-label">Project Title*</label>
-        <input type="text" name="title" class="form-control" required placeholder="e.g. E-commerce Website Redesign">
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">Description</label>
-        <textarea name="description" class="form-control" placeholder="Briefly describe your project..."></textarea>
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">Start Date</label>
-        <input type="date" name="start_date" class="form-control">
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">End Date</label>
-        <input type="date" name="end_date" class="form-control">
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">Access Type*</label>
-        <select name="access_type" id="access-select" class="form-control" required>
-          <option value="open">Public (Open to All)</option>
-          <option value="invite" selected>Private (By Invitation Only)</option>
-        </select>
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">Maximum Members</label>
-        <input type="number" name="max_members" min="1" value="5" class="form-control">
-      </div>
-      
-      <div class="form-group">
-        <label class="form-label">Project Categories*</label>
-        <select name="categories" multiple class="form-control" required>
-          <option value="web">Web Development</option>
-          <option value="app">Mobile App Development</option>
-          <option value="ml">Machine Learning / AI</option>
-          <option value="ds">Data Science</option>
-          <option value="uiux">UI/UX Design</option>
-          <option value="cyber">Cybersecurity</option>
-          <option value="iot">IoT & Embedded Systems</option>
-          <option value="game">Game Development</option>
-          <option value="blockchain">Blockchain</option>
-          <option value="other">Other</option>
-        </select>
-        <small class="form-text">Hold Ctrl (Windows) or Command (Mac) to select multiple options</small>
-      </div>
-      
-      <div class="fellows-section" id="fellows-section">
-        <button type="button" class="add-fellow-btn" id="add-fellow-btn">
-          <i class="fas fa-user-plus"></i> Add Team Members
-        </button>
-        
-        <div class="fellow-input-container" id="fellow-input-container" style="display: none;">
-          <input type="email" class="fellow-input" id="fellow-email" placeholder="team.member@example.com">
-          <button type="button" class="add-confirm-btn" id="add-fellow-confirm">
-            <i class="fas fa-check"></i>
-          </button>
-        </div>
-        
-        <div class="fellows-list" id="fellows-list"></div>
-        <input type="hidden" name="fellows" id="fellows-hidden-input" value="">
-      </div>
-      
-      <div class="form-footer">
-        <button type="button" class="btn btn-outline" id="cancel-project-btn">Cancel</button>
-        <button type="submit" class="btn btn-primary">Create Project</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<script>
-  // DOM Elements
-  const createBtn = document.getElementById("create-project-btn");
-  const emptyStateBtn = document.getElementById("empty-state-create-btn");
-  const modal = document.getElementById("create-modal");
-  const closeBtn = document.getElementById("close-modal-btn");
-  const cancelBtn = document.getElementById("cancel-project-btn");
-  const accessSelect = document.getElementById("access-select");
-  const fellowsSection = document.getElementById("fellows-section");
-  const addFellowBtn = document.getElementById("add-fellow-btn");
-  const fellowInputContainer = document.getElementById("fellow-input-container");
-  const fellowEmailInput = document.getElementById("fellow-email");
-  const addFellowConfirm = document.getElementById("add-fellow-confirm");
-  const fellowsList = document.getElementById("fellows-list");
-  const fellowsHiddenInput = document.getElementById("fellows-hidden-input");
-  
-  let fellows = [];
-
-  // Show modal
-  function showModal() {
-    modal.classList.add("active");
-    document.body.style.overflow = "hidden";
-  }
-
-  // Hide modal
-  function hideModal() {
-    modal.classList.remove("active");
-    document.body.style.overflow = "";
-    resetForm();
-  }
-
-  // Reset form
-  function resetForm() {
-    fellows = [];
-    updateFellowsList();
-    fellowInputContainer.style.display = "none";
-    fellowEmailInput.value = "";
-    accessSelect.value = "invite";
-    fellowsSection.style.display = "block";
-  }
-
-  // Event Listeners
-  createBtn.addEventListener("click", showModal);
-  if (emptyStateBtn) emptyStateBtn.addEventListener("click", showModal);
-  closeBtn.addEventListener("click", hideModal);
-  cancelBtn.addEventListener("click", hideModal);
-
-  // Close modal when clicking outside
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) hideModal();
-  });
-
-  // Access type change
-  accessSelect.addEventListener("change", function() {
-    if (this.value === "open") {
-      fellowsSection.style.display = "none";
-      fellows = [];
-      updateFellowsList();
-    } else {
-      fellowsSection.style.display = "block";
-    }
-  });
-
-  // Add fellow button
-  addFellowBtn.addEventListener("click", () => {
-    fellowInputContainer.style.display = "flex";
-    fellowEmailInput.focus();
-  });
-
-  // Add fellow confirmation
-  addFellowConfirm.addEventListener("click", addFellow);
-  fellowEmailInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") addFellow();
-  });
-
-  // Add fellow function
-  function addFellow() {
-    const email = fellowEmailInput.value.trim();
-    if (email && isValidEmail(email)) {
-      if (!fellows.includes(email)) {
-        fellows.push(email);
-        updateFellowsList();
-        fellowEmailInput.value = "";
-        fellowInputContainer.style.display = "none";
-      } else {
-        showAlert("This team member is already added!");
-      }
-    } else {
-      showAlert("Please enter a valid email address!");
-    }
-  }
-
-  // Update fellows list display
-  function updateFellowsList() {
-    fellowsHiddenInput.value = JSON.stringify(fellows);
-    
-    if (fellows.length > 0) {
-      fellowsList.innerHTML = fellows.map((email, index) => `
-        <div class="fellow-item">
-          <span>${email}</span>
-          <button type="button" class="remove-fellow" data-index="${index}">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-      `).join("");
-      
-      // Add event listeners to remove buttons
-      document.querySelectorAll(".remove-fellow").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-          const index = parseInt(e.currentTarget.getAttribute("data-index"));
-          fellows.splice(index, 1);
-          updateFellowsList();
-        });
-      });
-    } else {
-      fellowsList.innerHTML = '<div class="empty-state" style="padding: 1rem; text-align: center; color: #6c757d;">No team members added yet</div>';
-    }
-  }
-
-  // Email validation
-  function isValidEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  }
-
-  // Simple alert function
-  function showAlert(message) {
-    const alert = document.createElement("div");
-    alert.style.position = "fixed";
-    alert.style.bottom = "20px";
-    alert.style.left = "50%";
-    alert.style.transform = "translateX(-50%)";
-    alert.style.backgroundColor = "#2b2d42";
-    alert.style.color = "white";
-    alert.style.padding = "12px 24px";
-    alert.style.borderRadius = "8px";
-    alert.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
-    alert.style.zIndex = "1000";
-    alert.style.animation = "fadeIn 0.3s";
-    alert.textContent = message;
-    
-    document.body.appendChild(alert);
-    
-    setTimeout(() => {
-      alert.style.animation = "fadeOut 0.3s";
-      setTimeout(() => alert.remove(), 300);
-    }, 3000);
-  }
-
-  // Initialize fellows list
-  updateFellowsList();
-
-  // Handle scroll buttons for project grids
-  document.querySelectorAll('.project-grid-wrapper').forEach(wrapper => {
-    const grid = wrapper.querySelector('.project-grid');
-    const leftBtn = wrapper.querySelector('.left-btn');
-    const rightBtn = wrapper.querySelector('.right-btn');
-    const scrollAmount = 300;
-
-    leftBtn.addEventListener('click', () => {
-      grid.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    });
-    
-    rightBtn.addEventListener('click', () => {
-      grid.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    });
-
-    function updateButtons() {
-      leftBtn.disabled = grid.scrollLeft <= 10;
-      rightBtn.disabled = grid.scrollLeft + grid.clientWidth >= grid.scrollWidth - 10;
-    }
-
-    grid.addEventListener('scroll', updateButtons);
-    window.addEventListener('resize', updateButtons);
-    updateButtons();
-  });
-
-  // Add CSS for alerts
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; transform: translateX(-50%) translateY(0); }
-      to { opacity: 0; transform: translateX(-50%) translateY(20px); }
-    }
-  `;
-  document.head.appendChild(style);
-</script>
 
 {% endblock %}

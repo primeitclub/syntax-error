@@ -2,74 +2,94 @@
 {% block title %}Create Project{% endblock %}
 
 {% block content %}
-<style>
-  .form-section {
-    margin-top: 2rem;
-  }
-  .form-card {
-    background: white;
-    border-radius: 15px;
-    padding: 2rem;
-    max-width: 600px;
-    margin: auto;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-  }
-  .form-card h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-  .form-card .form-label {
-    font-weight: 600;
-  }
-  .form-card .btn-primary {
-    width: 100%;
-    margin-top: 1rem;
-  }
-  .messages .alert {
-    margin-bottom: 1rem;
-  }
-</style>
-
-<div class="form-section">
-  <div class="form-card">
-    <h2>Create New Project</h2>
+<div class="container mt-5 mb-5">
+  <div class="card shadow-sm rounded-4 p-4 mx-auto" style="max-width: 720px;">
+    <h2 class="text-center mb-4 fw-bold">🚀 Create New Project</h2>
 
     {% if messages %}
-    <div class="messages">
       {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-      </div>
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
       {% endfor %}
-    </div>
     {% endif %}
 
-    <form method="POST">
+    <form method="POST" novalidate>
       {% csrf_token %}
 
       <div class="mb-3">
-        <label for="title" class="form-label">Project Title</label>
-        <input type="text" class="form-control" id="title" name="title" maxlength="200" required>
+        <label for="title" class="form-label">🎯 Project Title</label>
+        <input type="text" class="form-control form-control-lg" id="title" name="title" maxlength="200" placeholder="Enter project title" required>
       </div>
 
       <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+        <label for="description" class="form-label">📝 Description</label>
+        <textarea class="form-control" id="description" name="description" rows="4" placeholder="Describe your project..." required></textarea>
       </div>
 
-      <div class="mb-3">
-        <label for="privacy" class="form-label">Project Visibility</label>
-        <select class="form-select" id="privacy" name="privacy" required>
-          <option value="private" selected>Private</option>
-          <option value="public">Public</option>
-        </select>
-        <div class="form-text mt-1">
-          <strong>Private</strong>: Only invited members can join<br>
-          <strong>Public</strong>: Anyone can join
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="start_date" class="form-label">📅 Start Date</label>
+          <input type="date" class="form-control" id="start_date" name="start_date">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="end_date" class="form-label">📅 End Date</label>
+          <input type="date" class="form-control" id="end_date" name="end_date">
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary">Create Project</button>
+      <div class="mb-3">
+        <label for="access_type" class="form-label">🔒 Project Visibility</label>
+        <select class="form-select" id="access_type" name="access_type" required>
+          <option value="invite" selected>Private (By Invitation Only)</option>
+          <option value="open">Public (Open to All)</option>
+        </select>
+        <small class="form-text text-muted mt-1">
+          <strong>Private:</strong> Only invited members can join.<br>
+          <strong>Public:</strong> Anyone can request to join.
+        </small>
+      </div>
+
+      <div class="mb-3">
+        <label for="max_members" class="form-label">👥 Max Members</label>
+        <input type="number" class="form-control" id="max_members" name="max_members" min="1" value="1" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="required_fields" class="form-label">🧩 Required Fields</label>
+        <input type="text" class="form-control" id="required_fields" name="required_fields" placeholder="e.g. Computer Science, IT, Business">
+      </div>
+
+      <div class="mb-3">
+        <label for="categories" class="form-label">🏷️ Categories</label>
+        <select class="form-select" id="categories" name="categories" multiple>
+          {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+          {% endfor %}
+        </select>
+        <small class="form-text text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</small>
+      </div>
+
+      <div class="mb-3">
+        <label for="required_skills" class="form-label">🛠️ Required Skills</label>
+        <select class="form-select" id="required_skills" name="required_skills" multiple>
+          {% for skill in skills %}
+            <option value="{{ skill.id }}">{{ skill.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="invitees" class="form-label">📩 Invite Members</label>
+        <input type="text" class="form-control" id="invitees" name="invitees" placeholder="Comma-separated usernames or emails">
+      </div>
+
+      <div class="d-grid mt-4">
+        <button type="submit" class="btn btn-primary btn-lg rounded-pill">
+          🚧 Create Project
+        </button>
+      </div>
     </form>
   </div>
 </div>
